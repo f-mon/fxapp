@@ -10,4 +10,10 @@ public interface Page extends HasId {
 		return getPageDef().getName();
 	}
 
+	boolean isRootPage();
+
+	Page getParentPage();
+
+	Activity getCurrentActivity();
+
 }

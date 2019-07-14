@@ -18,27 +18,39 @@ public class FxApplication extends Application {
 	@Override
 	public void init() throws Exception {
 		super.init();
-		
-		var args = getParameters().getRaw().toArray(new String[] {});
-		applicationContext = SpringApplication.run(SpringApp.class, args);
+		createApplicationContext();
+		applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
 	}
 
 	public void start(Stage primaryStage) {
-		
+		showPrimaryStage(primaryStage);
+		applicationContext.publishEvent(new InitializeApplication());
+		afterInitialize();
+		applicationContext.publishEvent(new StartupApplication());
+		afterStart();		
+	}
+
+	protected void createApplicationContext() {
+		var args = getParameters().getRaw().toArray(new String[] {});
+		var primarySources = new Class<?>[] { SpringApp.class, this.getClass() };
+		applicationContext = SpringApplication.run(primarySources, args);
+	}
+	
+	protected void afterInitialize() {
+	}
+	
+	protected void afterStart() {
+	}
+
+	protected void showPrimaryStage(Stage primaryStage) {
 //		stage.setTitle();
-		
 		//primaryStage.initStyle(StageStyle.UNDECORATED);
 		
 		ApplicationController appCtrl = applicationContext.getBean(ApplicationController.class);
 		Parent root = appCtrl.getView();
 		//WindowStyle.allowDrag(root, primaryStage);
 		primaryStage.setScene(new Scene(root));
-		primaryStage.show();	
-		
-		applicationContext.publishEvent(new InitializeApplication());
-		
-		applicationContext.publishEvent(new StartupApplication());
-		
+		primaryStage.show();
 	}
 	
 }

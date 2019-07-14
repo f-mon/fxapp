@@ -3,6 +3,7 @@ package it.fmoon.fxapp.mvc;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiFunction;
 
 import javax.annotation.PostConstruct;
 
@@ -27,6 +28,19 @@ public class BasePageImpl
 	implements Page,FxViewFactory
 {
 
+	public static class StopOptions {
+
+		boolean checkResume;
+		public boolean checkClosePage;
+		public boolean checkResumePage = true;
+		
+		public StopOptions(boolean checkResume,boolean checkClosePage) {
+			this.checkResume = checkResume;
+			this.checkClosePage = checkClosePage;
+		}
+
+	}
+
 	protected final String id = UUID.randomUUID().toString();
 	protected final PageDef pageDef;
 	
@@ -43,13 +57,19 @@ public class BasePageImpl
 	private ControllerStackViewContainer stackViewContainer;
 	
 	
+	private ActivityDef<?> initialActivity;
+	private BiFunction<BasePageImpl,StopOptions,Single<Optional<Activity>>> closedPageHandler;
+	private BasePageImpl parentPage;
+	
+	
 	public BasePageImpl(PageDef pageDef) {
 		this.pageDef = pageDef;
 	}
 	
 	@PostConstruct
 	public void initialize() {
-		stackViewContainer = new ControllerStackViewContainerHelper(()->this.stackPane,this.activityAnimator);
+		this.stackViewContainer = new ControllerStackViewContainerHelper(()->this.stackPane,this.activityAnimator);
+		this.initialActivity = this.pageDef.getInitialActivity();
 	}
 
 	@Override
@@ -61,6 +81,45 @@ public class BasePageImpl
 	public PageDef getPageDef() {
 		return pageDef;
 	}
+	
+	@Override
+	public boolean isRootPage() {
+		return getParentPage()==null;
+	}
+
+	public boolean isOnRootActivity() {
+		return activityStack.size()==1;
+	}
+	
+	@Override
+	public Activity getCurrentActivity() {
+		return activityStack.peekLast();
+	}
+	
+	@Override
+	public BasePageImpl getParentPage() {
+		return this.parentPage;
+	}
+	public void setParentPage(BasePageImpl parentPage) {
+		this.parentPage = parentPage;
+	}
+	
+	
+	public Single<Page> doStartPage() {
+		ActivityDef<?> initialActivity = getInitialActivityDef();
+		return startActivity(initialActivity)
+			.flatMap(act->Single.just(this));
+	}
+	
+	public Single<Optional<Activity>> doResumePage() {
+		return checkResumeActivity();
+	}
+	
+
+	protected ActivityDef<?> getInitialActivityDef() {
+		return this.initialActivity;
+	}
+	
 	
 	public Single<Activity> startActivity(ActivityDef<?> activityDef) {
 		return checkPauseActivity()
@@ -74,21 +133,23 @@ public class BasePageImpl
 	}
 
 	public Single<Optional<Activity>> stopActivity() {
-		return stopActivity(true);
+		return stopActivity(new StopOptions(true,true));
 	}
 	
-	public Single<Optional<Activity>> stopActivity(boolean checkResume) {
+	public Single<Optional<Activity>> stopActivity(StopOptions stopOptions) {
+		if (isRootPage() && isOnRootActivity()) {
+			return Single.just(Optional.empty());
+		}
 		if (!activityStack.isEmpty()) {
 			AbstractActivity<?> last = activityStack.removeLast();
 			return stackViewContainer.removeStoppedControllerView(last)
-				.flatMap(paused -> checkResume?
-						checkResumeActivity():
-						Single.just(Optional.empty()))
+				.flatMap(stopped -> afterStoppedActivity(last,stopOptions))
 				.flatMap(resumed ->Single.just(Optional.of(last)));
 		}
 		return Single.just(Optional.empty());
 	}
-	
+
+
 	public Single<Optional<Activity>> checkPauseActivity() {
 		if (!activityStack.isEmpty()) {
 			AbstractActivity<?> toPause = activityStack.getLast();
@@ -98,6 +159,18 @@ public class BasePageImpl
 		return Single.just(Optional.empty());
 	}
 
+
+	
+	private Single<Optional<Activity>> afterStoppedActivity(AbstractActivity<?> stopped, StopOptions stopOptions) {
+		if (stopOptions.checkResume && !activityStack.isEmpty()) {
+			return checkResumeActivity();
+		}
+		if (stopOptions.checkClosePage && activityStack.isEmpty()) {
+			return this.closedPageHandler.apply(this,stopOptions);
+		}
+		return Single.just(Optional.empty());
+	}
+	
 	private Single<Optional<Activity>> checkResumeActivity() {
 		if (!activityStack.isEmpty()) {
 			AbstractActivity<?> toResume = activityStack.getLast();
@@ -112,5 +185,12 @@ public class BasePageImpl
 		this.stackPane = new StackPane();
 		return stackPane;
 	}
+
+	public void setClosedPageHandler(BiFunction<BasePageImpl,StopOptions,Single<Optional<Activity>>> handler) {
+		this.closedPageHandler = handler;
+	}
+
+	
+
 
 }

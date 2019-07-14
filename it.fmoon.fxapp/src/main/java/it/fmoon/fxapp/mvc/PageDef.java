@@ -18,4 +18,6 @@ public abstract class PageDef {
 	public Page newPageInstance(ApplicationContext applicationContext) {
 		return applicationContext.getBean(this.pageType,this);
 	}
+	
+	abstract public ActivityDef<?> getInitialActivity();
 }
