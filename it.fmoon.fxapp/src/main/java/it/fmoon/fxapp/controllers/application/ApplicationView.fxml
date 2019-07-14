@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane prefHeight="900.0" prefWidth="1200.0"
+	stylesheets="@ApplicationView.css"
+	xmlns="http://javafx.com/javafx/11.0.1"
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="it.fmoon.fxapp.controllers.application.ApplicationController">
+	<children>
+		<ButtonBar buttonMinWidth="50.0" prefHeight="40.0"
+			prefWidth="50.0" style="-fx-background-color: #1f74ff;"
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="0.0">
+			<buttons>
+				<Button contentDisplay="RIGHT" maxWidth="40.0"
+					minWidth="40.0" mnemonicParsing="false" onAction="#onMenu"
+					prefWidth="50.0"
+					style="-fx-background-color: transparent; -fx-cursor: hand;"
+					ButtonBar.buttonData="LEFT">
+					<graphic>
+						<FontIcon iconColor="WHITE" iconLiteral="fa-bars"
+							iconSize="24" />
+					</graphic>
+
+				</Button>
+				<Button maxWidth="40.0" minWidth="40.0"
+					mnemonicParsing="false" onAction="#onLogin" prefHeight="25.0"
+					prefWidth="50.0"
+					style="-fx-background-color: transparent; -fx-cursor: hand;">
+					<graphic>
+						<FontIcon iconColor="WHITE" iconLiteral="fa-user"
+							iconSize="24" />
+					</graphic>
+				</Button>
+				<Button maxWidth="40.0" minWidth="40.0"
+					mnemonicParsing="false" onAction="#onClose" prefHeight="25.0"
+					prefWidth="50.0"
+					style="-fx-background-color: transparent; -fx-cursor: hand;">
+					<graphic>
+						<FontIcon iconColor="WHITE" iconLiteral="fa-chevron-left"
+							iconSize="24" />
+					</graphic>
+
+				</Button>
+			</buttons>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</ButtonBar>
+		<AnchorPane AnchorPane.bottomAnchor="0.0"
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+			AnchorPane.topAnchor="40.0">
+			<children>
+				<StackPane fx:id="bodyGroup" AnchorPane.bottomAnchor="0.0"
+					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+					AnchorPane.topAnchor="0.0" />
+			</children>
+		</AnchorPane>
+		<BorderPane fx:id="sideMenuPanel" prefWidth="300.0"
+			visible="false" AnchorPane.bottomAnchor="0.0"
+			AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+			<top>
+				<ButtonBar prefHeight="41.0"
+					style="-fx-background-color: red;" BorderPane.alignment="CENTER">
+					<buttons>
+						<Button maxWidth="40.0" minWidth="40.0"
+							mnemonicParsing="false" onAction="#onMenuClose" prefHeight="25.0"
+							prefWidth="50.0"
+							style="-fx-background-color: transparent; -fx-cursor: hand;">
+							<graphic>
+								<FontIcon iconColor="WHITE"
+									iconLiteral="fa-chevron-left" iconSize="24" />
+							</graphic>
+
+						</Button>
+					</buttons>
+				</ButtonBar>
+			</top>
+			<center>
+				<ListView />
+			</center>
+		</BorderPane>
+	</children>
+</AnchorPane>
