@@ -4,6 +4,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import it.fmoon.fxapp.support.FxViewFactory;
 import javafx.scene.Parent;
 
 @Component
@@ -20,7 +21,11 @@ public class FxViewLoader {
 
 	public Parent get(Object controller) {
 		if (this.view==null) {
-			this.view = this.fxLoader.loadView(controller);
+			if (controller instanceof FxViewFactory) {
+				this.view = ((FxViewFactory) controller).createView();
+			} else {				
+				this.view = this.fxLoader.loadView(controller);
+			}
 		}
 		return this.view;
 	}

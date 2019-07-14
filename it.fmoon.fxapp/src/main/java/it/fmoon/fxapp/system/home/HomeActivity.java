@@ -1,4 +1,4 @@
-package it.fmoon.fxapp.controllers.home;
+package it.fmoon.fxapp.system.home;
 
 import java.util.List;
 
@@ -17,9 +17,7 @@ import javafx.scene.layout.FlowPane;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class HomeActivity extends AbstractActivity {
-
-	HomeActivityDef def;
+public class HomeActivity extends AbstractActivity<HomeActivityDef> {
 
 	@Autowired
 	List<ActivityDef<?>> allActivityDefs;
@@ -30,8 +28,7 @@ public class HomeActivity extends AbstractActivity {
 	@FXML FlowPane pane;
 
 	public HomeActivity(HomeActivityDef def) {
-		super();
-		this.def = def;
+		super(def);
 	}
 
 	@FXML

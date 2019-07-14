@@ -8,66 +8,62 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import io.reactivex.Single;
-import it.fmoon.fxapp.controllers.application.ApplicationController;
-import it.fmoon.fxapp.mvc.AbstractActivity;
+import it.fmoon.fxapp.controllers.application.ControllerStackViewContainer;
+import it.fmoon.fxapp.mvc.Activity;
 import it.fmoon.fxapp.mvc.ActivityDef;
+import it.fmoon.fxapp.mvc.BasePageImpl;
+import it.fmoon.fxapp.mvc.Page;
+import it.fmoon.fxapp.mvc.PageDef;
 
 @Component
 public class ActivityManagerImpl implements ActivityManager {
 
-	private LinkedList<AbstractActivity> activityStack = new LinkedList<>();
+	private LinkedList<BasePageImpl> pagesStack = new LinkedList<>();
 	
 	@Autowired
 	ApplicationContext applicationContext;
 	
 	@Autowired
-	ApplicationController applicationController;
+	ControllerStackViewContainer stackViewContainer;
 	
-
-	public Single<AbstractActivity> startActivity(ActivityDef<?> activityDef) {
-		return pauseActivity()
+	
+	@Override
+	public Single<Page> startPage(PageDef pageDef) {
+		return checkPausePage()
 			.flatMap((r)->{				
-				AbstractActivity newActivityInstance = activityDef.newActivityInstance(applicationContext);
-				activityStack.add(newActivityInstance);
-				return applicationController.showStartedControllerView(newActivityInstance)
-					.flatMap(r2->Single.just(newActivityInstance));
+				Page newPageInstance = pageDef.newPageInstance(applicationContext);
+				BasePageImpl basePageImpl = (BasePageImpl)newPageInstance;
+				pagesStack.add(basePageImpl);
+				return stackViewContainer.showStartedControllerView(basePageImpl)
+					.flatMap(r2->Single.just(newPageInstance));
 			});
 	}
 
-	public Single<Optional<AbstractActivity>> stopActivity() {
-		return stopActivity(true);
-	}
-	
-	public Single<Optional<AbstractActivity>> stopActivity(boolean checkResume) {
-		if (!activityStack.isEmpty()) {
-			AbstractActivity last = activityStack.removeLast();
-			return applicationController.removeStoppedControllerView(last)
-				.flatMap(paused -> checkResume?
-						checkResumeActivity():
-						Single.just(Optional.empty()))
-				.flatMap(resumed ->Single.just(Optional.of(last)));
-		}
-		return Single.just(Optional.empty());
-	}
-	
-	public Single<Optional<AbstractActivity>> pauseActivity() {
-		if (!activityStack.isEmpty()) {
-			AbstractActivity toPause = activityStack.getLast();
-			return applicationController.pauseControllerView(toPause)
+
+	public Single<Optional<Page>> checkPausePage() {
+		if (!pagesStack.isEmpty()) {
+			BasePageImpl toPause = pagesStack.getLast();
+			return stackViewContainer.pauseControllerView(toPause)
 				.flatMap(r->Single.just(Optional.of(toPause)));
 		}
 		return Single.just(Optional.empty());
 	}
 
-	private Single<Optional<AbstractActivity>> checkResumeActivity() {
-		if (!activityStack.isEmpty()) {
-			AbstractActivity toResume = activityStack.getLast();
-			return applicationController.showResumedControllerView(toResume)
-				.flatMap(view ->Single.just(Optional.of(toResume)));
-		}
-		return Single.just(Optional.empty());
+
+	@Override
+	public Single<Activity> startActivity(ActivityDef<?> activityDef) {
+		return _getCurrentPage().startActivity(activityDef);
 	}
+
+	@Override
+	public Single<Optional<Activity>> stopActivity() {
+		return _getCurrentPage().stopActivity();
+	}
+
 	
-	
+	protected BasePageImpl _getCurrentPage() {
+		return pagesStack.isEmpty()?null:pagesStack.getLast();
+	}
+
 	
 }

@@ -9,7 +9,7 @@
 
 
 <TilePane alignment="CENTER" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-fx:controller="it.fmoon.fxapp.controllers.login.LoginActivity"
+fx:controller="it.fmoon.fxapp.system.login.LoginActivity"
 style="-fx-background-color: red;">
    <children>
       <GridPane>

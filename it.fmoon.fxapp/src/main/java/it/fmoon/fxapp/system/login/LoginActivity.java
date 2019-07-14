@@ -1,4 +1,4 @@
-package it.fmoon.fxapp.controllers.login;
+package it.fmoon.fxapp.system.login;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -8,13 +8,10 @@ import it.fmoon.fxapp.mvc.AbstractActivity;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class LoginActivity extends AbstractActivity {
-
-	LoginActivityDef def;
+public class LoginActivity extends AbstractActivity<LoginActivityDef> {
 
 	public LoginActivity(LoginActivityDef def) {
-		super();
-		this.def = def;
+		super(def);
 	}
 	
 }

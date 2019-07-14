@@ -1,6 +1,5 @@
-package it.fmoon.fxapp.controllers.home;
+package it.fmoon.fxapp.system.home;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import it.fmoon.fxapp.mvc.ActivityDef;
@@ -8,13 +7,13 @@ import it.fmoon.fxapp.mvc.ActivityDef;
 @Component
 public class HomeActivityDef extends ActivityDef<HomeActivity> {
 
+	public HomeActivityDef() {
+		super(HomeActivity.class);
+	}
+
 	@Override
 	public String getName() {
 		return "homeActivity";
-	}
-	
-	public HomeActivity newActivityInstance(ApplicationContext applicationContext) {
-		return applicationContext.getBean(HomeActivity.class,this);
 	}
 
 	
