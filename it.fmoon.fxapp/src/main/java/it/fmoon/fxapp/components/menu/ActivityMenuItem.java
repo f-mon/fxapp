@@ -4,14 +4,36 @@ import it.fmoon.fxapp.mvc.ActivityDef;
 
 public class ActivityMenuItem extends AppMenuItem {
 	
-	protected ActivityDef<?> activityDef;
+	protected final ActivityDef<?> activityDef;
+	
+	public static ActivityMenuItemBuilder builder() {
+		return new ActivityMenuItemBuilder();
+	}
 
-	public ActivityMenuItem(ActivityDef<?> activityDef) {
+	public ActivityMenuItem(ActivityDef<?> activityDef,String label, String icon) {
+		super(label, icon);
 		this.activityDef = activityDef;
 	}
 
 	public ActivityDef<?> getActivityDef() {
 		return activityDef;
 	}	
+	
+	
+	public static class ActivityMenuItemBuilder extends AppMenuItem.AppMenuItemBuilder<ActivityMenuItemBuilder, ActivityMenuItem> {
+
+		private ActivityDef<?> activityDef;
+		
+		public ActivityMenuItemBuilder activityDef(ActivityDef<?> activityDef) {
+			this.activityDef = activityDef;
+			return this;
+		}
+		
+		@Override
+		public ActivityMenuItem build() {
+			return new ActivityMenuItem(activityDef,this.label,this.icon);
+		}
+		
+	}
 	
 }

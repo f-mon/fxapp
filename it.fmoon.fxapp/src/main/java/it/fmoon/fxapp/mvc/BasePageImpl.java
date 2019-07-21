@@ -1,6 +1,9 @@
 package it.fmoon.fxapp.mvc;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -13,9 +16,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
+
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.components.ActivityAnimator;
 import it.fmoon.fxapp.components.ControllerStackViewContainer;
+import it.fmoon.fxapp.components.menu.AppMenuItem;
 import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
 import it.fmoon.fxapp.support.FxViewFactory;
 import javafx.scene.Parent;
@@ -45,6 +53,7 @@ public class BasePageImpl
 	protected final PageDef pageDef;
 	
 	private LinkedList<AbstractActivity<?>> activityStack = new LinkedList<>();
+	private BehaviorSubject<List<Activity>> activityStackObs = BehaviorSubject.createDefault(Collections.unmodifiableList(activityStack));
 	
 	@Autowired
 	private ApplicationContext applicationContext;
@@ -56,10 +65,14 @@ public class BasePageImpl
 	
 	private ControllerStackViewContainer stackViewContainer;
 	
+	private List<AppMenuItem> pageMenu = Lists.newArrayList();
+	private BehaviorSubject<List<AppMenuItem>> pageMenuSubject = BehaviorSubject.createDefault(pageMenu);
+	
 	
 	private ActivityDef<?> initialActivity;
 	private BiFunction<BasePageImpl,StopOptions,Single<Optional<Activity>>> closedPageHandler;
 	private BasePageImpl parentPage;
+	private String title;
 	
 	
 	public BasePageImpl(PageDef pageDef) {
@@ -67,9 +80,20 @@ public class BasePageImpl
 	}
 	
 	@PostConstruct
-	public void initialize() {
+	public void initializePage() {
 		this.stackViewContainer = new ControllerStackViewContainerHelper(()->this.stackPane,this.activityAnimator);
 		this.initialActivity = this.pageDef.getInitialActivity();
+		initTitle();
+		initPageMenu();
+	}
+
+	protected void initPageMenu() {
+		this.pageMenu.clear();
+		this.pageMenu.addAll(this.pageDef.getPageMenu());
+	}
+
+	protected void initTitle() {
+		this.title = this.pageDef.getName();
 	}
 
 	@Override
@@ -94,6 +118,11 @@ public class BasePageImpl
 	@Override
 	public Activity getCurrentActivity() {
 		return activityStack.peekLast();
+	}
+
+	@Override
+	public List<Activity> getActivityStack() {
+		return Collections.unmodifiableList(this.activityStack);
 	}
 	
 	@Override
@@ -120,13 +149,13 @@ public class BasePageImpl
 		return this.initialActivity;
 	}
 	
-	
 	public Single<Activity> startActivity(ActivityDef<?> activityDef) {
 		return checkPauseActivity()
 			.flatMap((r)->{				
 				Activity newActivityInstance = activityDef.newActivityInstance(applicationContext);
 				AbstractActivity<?> aa = (AbstractActivity<?>)newActivityInstance;
 				activityStack.add(aa);
+				notifyActivityStack();
 				return stackViewContainer.showStartedControllerView(aa)
 					.flatMap(r2->Single.just(newActivityInstance));
 			});
@@ -142,13 +171,13 @@ public class BasePageImpl
 		}
 		if (!activityStack.isEmpty()) {
 			AbstractActivity<?> last = activityStack.removeLast();
+			notifyActivityStack();
 			return stackViewContainer.removeStoppedControllerView(last)
 				.flatMap(stopped -> afterStoppedActivity(last,stopOptions))
 				.flatMap(resumed ->Single.just(Optional.of(last)));
 		}
 		return Single.just(Optional.empty());
 	}
-
 
 	public Single<Optional<Activity>> checkPauseActivity() {
 		if (!activityStack.isEmpty()) {
@@ -159,8 +188,6 @@ public class BasePageImpl
 		return Single.just(Optional.empty());
 	}
 
-
-	
 	private Single<Optional<Activity>> afterStoppedActivity(AbstractActivity<?> stopped, StopOptions stopOptions) {
 		if (stopOptions.checkResume && !activityStack.isEmpty()) {
 			return checkResumeActivity();
@@ -190,7 +217,22 @@ public class BasePageImpl
 		this.closedPageHandler = handler;
 	}
 
+	public Observable<List<Activity>> onActivityStack() {
+		return activityStackObs;
+	}
 	
+	private void notifyActivityStack() {
+		this.activityStackObs.onNext(Collections.unmodifiableList(this.activityStack));
+	}
 
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public Observable<List<AppMenuItem>> getPageMenuObs() {
+		return this.pageMenuSubject;
+	}
 
 }

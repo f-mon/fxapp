@@ -1,6 +1,10 @@
 package it.fmoon.fxapp.mvc;
 
+import java.util.List;
+
+import io.reactivex.Observable;
 import it.fmoon.fxapp.common.HasId;
+import it.fmoon.fxapp.components.menu.AppMenuItem;
 
 public interface Page extends HasId {
 	
@@ -10,10 +14,18 @@ public interface Page extends HasId {
 		return getPageDef().getName();
 	}
 
+	String getTitle();
+	
 	boolean isRootPage();
 
 	Page getParentPage();
 
 	Activity getCurrentActivity();
+	
+	List<Activity> getActivityStack();
+
+	Observable<List<AppMenuItem>> getPageMenuObs();
+
+
 
 }

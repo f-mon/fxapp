@@ -4,9 +4,14 @@ import it.fmoon.fxapp.mvc.PageDef;
 
 public class PageMenuItem extends AppMenuItem {
 	
-	protected PageDef pageDef;
+	protected final PageDef pageDef;
+	
+	public static PageMenuItemBuilder builder() {
+		return new PageMenuItemBuilder();
+	}
 
-	public PageMenuItem(PageDef pageDef) {
+	public PageMenuItem(PageDef pageDef,String label, String icon) {
+		super(label, icon);
 		this.pageDef = pageDef;
 	}
 
@@ -14,4 +19,20 @@ public class PageMenuItem extends AppMenuItem {
 		return pageDef;
 	}	
 	
+	public static class PageMenuItemBuilder extends AppMenuItem.AppMenuItemBuilder<PageMenuItemBuilder, PageMenuItem> {
+
+		private PageDef pageDef;
+		
+		public PageMenuItemBuilder pageDef(PageDef pageDef) {
+			this.pageDef = pageDef;
+			return this;
+		}
+		
+		@Override
+		public PageMenuItem build() {
+			return new PageMenuItem(pageDef,this.label,this.icon);
+		}
+		
+	}
+
 }

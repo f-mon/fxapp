@@ -12,4 +12,6 @@ public interface MenuManager {
 	
 	Observable<List<AppMenuItem>> getApplicationMenusObs();
 
+	Observable<List<AppMenuItem>> getCurrentPageMenusObs();
+	
 }

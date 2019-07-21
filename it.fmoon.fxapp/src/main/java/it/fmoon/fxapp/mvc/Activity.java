@@ -10,6 +10,8 @@ public interface Activity extends HasId {
 		return getActivityDef().getName();
 	}
 	
+	String getTitle();
+	
 	Activity getParentActivity();
 	
 	Page getPage();

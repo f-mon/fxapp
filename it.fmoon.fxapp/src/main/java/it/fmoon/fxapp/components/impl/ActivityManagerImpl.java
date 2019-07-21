@@ -1,6 +1,8 @@
 package it.fmoon.fxapp.components.impl;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.components.ActivityManager;
 import it.fmoon.fxapp.components.ControllerStackViewContainer;
 import it.fmoon.fxapp.mvc.Activity;
@@ -23,6 +27,7 @@ import it.fmoon.fxapp.mvc.PageDef;
 public class ActivityManagerImpl implements ActivityManager {
 
 	private LinkedList<BasePageImpl> pagesStack = new LinkedList<>();
+	private BehaviorSubject<List<Page>> navigationStack = BehaviorSubject.createDefault(Collections.unmodifiableList(pagesStack));
 	
 	@Autowired
 	ApplicationContext applicationContext;
@@ -39,15 +44,20 @@ public class ActivityManagerImpl implements ActivityManager {
 				BasePageImpl basePageImpl = (BasePageImpl)newPageInstance;
 				basePageImpl.setParentPage(pagesStack.peekLast());
 				pagesStack.add(basePageImpl);
+				
+				basePageImpl.onActivityStack().subscribe(actList->this.notifyNavStack());
+				notifyNavStack();
+				
 				basePageImpl.setClosedPageHandler((page,stopOptions)->completeClosingPage(page,stopOptions));
 				return stackViewContainer.showStartedControllerView(basePageImpl)
 					.flatMap(r2->basePageImpl.doStartPage());
 			});
 	}
-	
+
 	private Single<Optional<Activity>> completeClosingPage(BasePageImpl closedPage,StopOptions stopOptions) {
 		Preconditions.checkState(pagesStack.getLast()==closedPage);
 		pagesStack.remove(closedPage);
+		notifyNavStack();
 		if (stopOptions.checkResumePage && !pagesStack.isEmpty()) {
 			var toResume = pagesStack.getLast();
 			return stackViewContainer.showResumedControllerView(toResume)
@@ -82,5 +92,21 @@ public class ActivityManagerImpl implements ActivityManager {
 		return pagesStack.isEmpty()?null:pagesStack.getLast();
 	}
 
+	@Override
+	public Observable<List<Page>> onNavigationStack() {
+		return navigationStack;
+	}
+
+	private void notifyNavStack() {
+		System.out.println("fire notify Act Stack");
+		this.navigationStack.onNext(Collections.unmodifiableList(pagesStack));
+	}
+
+	@Override
+	public Observable<Page> onCurrentPage() {
+		return this.navigationStack
+			.map(navStack->navStack.get(navStack.size()-1))
+			.distinct();
+	}
 	
 }
