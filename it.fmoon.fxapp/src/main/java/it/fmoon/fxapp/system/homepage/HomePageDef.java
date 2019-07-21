@@ -23,7 +23,7 @@ public class HomePageDef extends PageDef {
 	}
 	
 	@Override
-	protected void initPageMenu(List<AppMenuItem> pageMenuDefinition) {
+	protected void definePageMenu(List<AppMenuItem> pageMenuDefinition) {
 		pageMenuDefinition.add(
 			ActivityMenuItem.builder()
 				.activityDef(homeActivity)

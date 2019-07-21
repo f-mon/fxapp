@@ -1,6 +1,5 @@
 package it.fmoon.fxapp.mvc;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,13 +37,25 @@ public class BasePageImpl
 
 	public static class StopOptions {
 
-		boolean checkResume;
-		public boolean checkClosePage;
-		public boolean checkResumePage = true;
+		private boolean checkResume;
+		private boolean checkClosePage;
+		private boolean preventCloseRootActivity;
+		private boolean checkResumePage = true;
 		
 		public StopOptions(boolean checkResume,boolean checkClosePage) {
+			this(checkResume,checkClosePage,true);
+		}
+		public StopOptions(boolean checkResume,boolean checkClosePage,boolean preventCloseRootActivity) {
 			this.checkResume = checkResume;
 			this.checkClosePage = checkClosePage;
+			this.preventCloseRootActivity = preventCloseRootActivity;
+		}
+
+		public boolean isPreventCloseRootActivity() {
+			return this.preventCloseRootActivity;
+		}
+		public boolean isCheckResumePage() {
+			return this.checkResumePage;
 		}
 
 	}
@@ -144,7 +155,6 @@ public class BasePageImpl
 		return checkResumeActivity();
 	}
 	
-
 	protected ActivityDef<?> getInitialActivityDef() {
 		return this.initialActivity;
 	}
@@ -160,13 +170,26 @@ public class BasePageImpl
 					.flatMap(r2->Single.just(newActivityInstance));
 			});
 	}
+	
+	public Single<Activity> startRootActivity(ActivityDef<?> activityDef) {
+		return stopAllActivities()
+			.flatMap(page->startActivity(activityDef));
+	}
 
+	public Single<Page> stopAllActivities() {
+		if (activityStack.isEmpty()) {
+			return Single.just(this);
+		}
+		return stopActivity(new StopOptions(true,false,false))
+			.flatMap(stopped->stopAllActivities());
+	}
+	
 	public Single<Optional<Activity>> stopActivity() {
 		return stopActivity(new StopOptions(true,true));
 	}
 	
 	public Single<Optional<Activity>> stopActivity(StopOptions stopOptions) {
-		if (isRootPage() && isOnRootActivity()) {
+		if (stopOptions.isPreventCloseRootActivity() && isRootPage() && isOnRootActivity()) {
 			return Single.just(Optional.empty());
 		}
 		if (!activityStack.isEmpty()) {
@@ -234,5 +257,6 @@ public class BasePageImpl
 	public Observable<List<AppMenuItem>> getPageMenuObs() {
 		return this.pageMenuSubject;
 	}
+
 
 }

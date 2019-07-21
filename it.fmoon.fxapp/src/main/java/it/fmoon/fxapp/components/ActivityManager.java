@@ -11,17 +11,19 @@ import it.fmoon.fxapp.mvc.Page;
 import it.fmoon.fxapp.mvc.PageDef;
 
 public interface ActivityManager {
-
 	
 	public Single<Page> startPage(PageDef pageDef);
 	
+	public Single<Page> startRootPage(PageDef pageDef);
+	
 	public Single<Activity> startActivity(ActivityDef<?> activityDef);
+	
+	public Single<Activity> startRootPageActivity(ActivityDef<?> activityDef);
 
 	public Single<Optional<Activity>> stopActivity();
 
 	public Observable<List<Page>> onNavigationStack();
 
 	public Observable<Page> onCurrentPage();
-	
-	
+
 }

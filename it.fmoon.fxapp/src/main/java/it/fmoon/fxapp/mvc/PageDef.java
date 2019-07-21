@@ -27,9 +27,9 @@ public abstract class PageDef {
 	
 	@PostConstruct
 	protected void initializePageDef() {
-		initPageMenu(this.pageMenuDefinition);
+		definePageMenu(this.pageMenuDefinition);
 	}
-	protected void initPageMenu(List<AppMenuItem> pageMenuDefinition) {}
+	protected void definePageMenu(List<AppMenuItem> pageMenuDefinition) {}
 	
 	public Page newPageInstance(ApplicationContext applicationContext) {
 		return applicationContext.getBean(this.pageType,this);

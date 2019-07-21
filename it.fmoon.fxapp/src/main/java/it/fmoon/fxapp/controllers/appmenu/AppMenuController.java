@@ -48,13 +48,11 @@ public class AppMenuController extends AbstractController {
 		this.pageMenuPanel = new VBox();
 		
 		this.menuManager.getApplicationMenusObs().subscribe(appMenuList->{
-			this.redrawMenu(this.applicationMenuPanel,appMenuList);
+			this.redrawMenu(this.applicationMenuPanel,appMenuList,false);
 		});
 		this.menuManager.getCurrentPageMenusObs().subscribe(appMenuList->{
-			System.out.println("---> update page menu");
-			this.redrawMenu(this.pageMenuPanel,appMenuList);
+			this.redrawMenu(this.pageMenuPanel,appMenuList,true);
 		});
-		
 		updateStateView();
 	}
 
@@ -81,37 +79,50 @@ public class AppMenuController extends AbstractController {
 		
 	}
 
-	protected void redrawMenu(VBox menuPanel, List<AppMenuItem> appMenuList) {
+	protected void redrawMenu(VBox menuPanel, List<AppMenuItem> appMenuList, boolean isPageMenu) {
 		menuPanel.getChildren().clear();
 		appMenuList.forEach(menuItem -> {
 			if (menuItem instanceof ActivityMenuItem) {
-				Region view = createActivityMenuItemView((ActivityMenuItem) menuItem);
+				Region view = createActivityMenuItemView((ActivityMenuItem) menuItem,isPageMenu);
 				menuPanel.getChildren().add(view);
 			} else if (menuItem instanceof PageMenuItem) {
-				Region view = createPageMenuItemView((PageMenuItem) menuItem);
+				Region view = createPageMenuItemView((PageMenuItem) menuItem,isPageMenu);
 				menuPanel.getChildren().add(view);
 			}
 		});
 	}
 
-	protected Region createPageMenuItemView(PageMenuItem menuItem) {
-		PageDef pageDef = ((PageMenuItem) menuItem).getPageDef();
-
+	protected Region createPageMenuItemView(PageMenuItem menuItem, boolean isPageMenu) {
+		PageDef pageDef = menuItem.getPageDef();
 		Button button = new Button("Page: " + menuItem.getLabel());
 		button.setOnAction((ActionEvent e) -> {
-			activityManager.startPage(pageDef).subscribe();
+			onPageMenuItemClick(menuItem,pageDef,isPageMenu);
 		});
 		return button;
 	}
 
-	protected Region createActivityMenuItemView(ActivityMenuItem menuItem) {
+	protected Region createActivityMenuItemView(ActivityMenuItem menuItem, boolean isPageMenu) {
 		ActivityDef<?> activityDef = menuItem.getActivityDef();
-
 		Button button = new Button("Activity: " + menuItem.getLabel());
 		button.setOnAction((ActionEvent e) -> {
-			activityManager.startActivity(activityDef).subscribe();
+			onActivityMenuItemClick(menuItem,activityDef,isPageMenu);
 		});
 		return button;
 	}
 
+	protected void onActivityMenuItemClick(ActivityMenuItem menuItem, ActivityDef<?> activityDef, boolean isPageMenu) {
+		if (isPageMenu) {			
+			activityManager.startRootPageActivity(activityDef).subscribe();
+		} else {
+			activityManager.startActivity(activityDef).subscribe();
+		}
+	}
+
+	protected void onPageMenuItemClick(PageMenuItem menuItem, PageDef pageDef, boolean isPageMenu) {
+		if (isPageMenu) {			
+			activityManager.startPage(pageDef).subscribe();
+		} else {
+			activityManager.startRootPage(pageDef).subscribe();
+		}
+	}
 }

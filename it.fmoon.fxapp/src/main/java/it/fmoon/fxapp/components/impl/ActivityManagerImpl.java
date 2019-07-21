@@ -53,12 +53,18 @@ public class ActivityManagerImpl implements ActivityManager {
 					.flatMap(r2->basePageImpl.doStartPage());
 			});
 	}
+	
+	@Override
+	public Single<Page> startRootPage(PageDef pageDef) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	private Single<Optional<Activity>> completeClosingPage(BasePageImpl closedPage,StopOptions stopOptions) {
 		Preconditions.checkState(pagesStack.getLast()==closedPage);
 		pagesStack.remove(closedPage);
 		notifyNavStack();
-		if (stopOptions.checkResumePage && !pagesStack.isEmpty()) {
+		if (stopOptions.isCheckResumePage() && !pagesStack.isEmpty()) {
 			var toResume = pagesStack.getLast();
 			return stackViewContainer.showResumedControllerView(toResume)
 				.flatMap(view->toResume.doResumePage());
@@ -80,6 +86,11 @@ public class ActivityManagerImpl implements ActivityManager {
 	@Override
 	public Single<Activity> startActivity(ActivityDef<?> activityDef) {
 		return _getCurrentPage().startActivity(activityDef);
+	}
+	
+	@Override
+	public Single<Activity> startRootPageActivity(ActivityDef<?> activityDef) {
+		return _getCurrentPage().startRootActivity(activityDef);
 	}
 
 	@Override
