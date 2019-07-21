@@ -17,10 +17,9 @@ import it.fmoon.fxapp.events.InitializeApplication;
 import it.fmoon.fxapp.events.StartupApplication;
 import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
+import it.fmoon.fxapp.system.home.HomeActivityDef;
 import it.fmoon.fxapp.system.homepage.HomePageDef;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +40,9 @@ public class ApplicationController
 
 	@Autowired
 	private HomePageDef homePageDef;
+	
+	@Autowired
+	private HomeActivityDef homeActivityDef;
 
 	@Autowired
 	ActivityManager activityManager;
@@ -76,13 +78,11 @@ public class ApplicationController
 
 	@EventListener
 	public void onInitializeApplication(InitializeApplication event) {
-
+		activityManager.registerApplicationRootPageAndActivity(homePageDef, homeActivityDef);
 	}
 
 	@EventListener
 	public void onstartupApplication(StartupApplication event) {
-		activityManager.startPage(homePageDef)
-			.subscribe();
 		
 		Parent navBar = appNavBarController.getView();
 		outerPanel.getChildren().add(navBar);
@@ -97,7 +97,6 @@ public class ApplicationController
 		appNavBarController.onClose().subscribe(this::onClose);
 		appNavBarController.onLogin().subscribe(this::onLogin);
 		appNavBarController.onMenu().subscribe(this::onMenu);
-		
 	}
 	
 	@FXML

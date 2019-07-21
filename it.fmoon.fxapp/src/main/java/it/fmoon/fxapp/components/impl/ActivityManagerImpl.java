@@ -35,6 +35,14 @@ public class ActivityManagerImpl implements ActivityManager {
 	@Autowired
 	ControllerStackViewContainer stackViewContainer;
 	
+	private PageDef applicationRootPage;
+	private ActivityDef<?> applicationRootActivity;
+	
+	
+	@Override
+	public Single<Page> startApplication() {
+		return startPage(applicationRootPage);
+	}
 	
 	@Override
 	public Single<Page> startPage(PageDef pageDef) {
@@ -116,8 +124,28 @@ public class ActivityManagerImpl implements ActivityManager {
 	@Override
 	public Observable<Page> onCurrentPage() {
 		return this.navigationStack
-			.map(navStack->navStack.get(navStack.size()-1))
+			.map(navStack->navStack.isEmpty()?
+					Optional.<Page>empty():
+					Optional.of(navStack.get(navStack.size()-1)))
+			.filter(opt->opt.isPresent())
+			.map(opt->opt.get())
 			.distinct();
+	}
+
+	@Override
+	public void registerApplicationRootPageAndActivity(PageDef appRootPage, ActivityDef<?> appRootActivity) {
+		this.applicationRootPage = appRootPage;
+		this.applicationRootActivity = appRootActivity;
+	}
+
+	@Override
+	public boolean isApplicationRootPage(PageDef pageDef) {
+		return this.applicationRootPage.getName().equals(pageDef.getName());
+	}
+
+	@Override
+	public boolean isApplicationRootActivity(ActivityDef<?> activityDef) {
+		return this.applicationRootActivity.getName().equals(activityDef.getName());
 	}
 	
 }

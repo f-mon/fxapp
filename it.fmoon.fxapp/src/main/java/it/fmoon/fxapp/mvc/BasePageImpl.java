@@ -21,6 +21,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.components.ActivityAnimator;
+import it.fmoon.fxapp.components.ActivityManager;
 import it.fmoon.fxapp.components.ControllerStackViewContainer;
 import it.fmoon.fxapp.components.menu.AppMenuItem;
 import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
@@ -39,23 +40,23 @@ public class BasePageImpl
 
 		private boolean checkResume;
 		private boolean checkClosePage;
-		private boolean preventCloseRootActivity;
+		private boolean preventCloseAppRootActivity;
 		private boolean checkResumePage = true;
 		
 		public StopOptions(boolean checkResume,boolean checkClosePage) {
 			this(checkResume,checkClosePage,true);
 		}
-		public StopOptions(boolean checkResume,boolean checkClosePage,boolean preventCloseRootActivity) {
+		public StopOptions(boolean checkResume,boolean checkClosePage,boolean preventCloseAppRootActivity) {
 			this.checkResume = checkResume;
 			this.checkClosePage = checkClosePage;
-			this.preventCloseRootActivity = preventCloseRootActivity;
+			this.preventCloseAppRootActivity = preventCloseAppRootActivity;
 		}
 
-		public boolean isPreventCloseRootActivity() {
-			return this.preventCloseRootActivity;
-		}
 		public boolean isCheckResumePage() {
 			return this.checkResumePage;
+		}
+		public boolean isPreventCloseAppRootActivity() {
+			return this.preventCloseAppRootActivity;
 		}
 
 	}
@@ -71,6 +72,9 @@ public class BasePageImpl
 	
 	@Autowired
 	private ActivityAnimator activityAnimator;
+	
+	@Autowired
+	private ActivityManager activityManager;
 	
 	private StackPane stackPane;
 	
@@ -121,9 +125,18 @@ public class BasePageImpl
 	public boolean isRootPage() {
 		return getParentPage()==null;
 	}
+	private boolean isApplicationRootPage() {
+		return this.activityManager.isApplicationRootPage(this.pageDef);
+	}
 
-	public boolean isOnRootActivity() {
+	public boolean isOnPageRootActivity() {
 		return activityStack.size()==1;
+	}
+	
+	public boolean isOnApplicationRootActivity() {
+		return isApplicationRootPage() && 
+			this.isOnPageRootActivity() &&
+			this.activityManager.isApplicationRootActivity(this.getCurrentActivity().getActivityDef());
 	}
 	
 	@Override
@@ -189,7 +202,7 @@ public class BasePageImpl
 	}
 	
 	public Single<Optional<Activity>> stopActivity(StopOptions stopOptions) {
-		if (stopOptions.isPreventCloseRootActivity() && isRootPage() && isOnRootActivity()) {
+		if (stopOptions.isPreventCloseAppRootActivity() && isOnApplicationRootActivity()) {
 			return Single.just(Optional.empty());
 		}
 		if (!activityStack.isEmpty()) {

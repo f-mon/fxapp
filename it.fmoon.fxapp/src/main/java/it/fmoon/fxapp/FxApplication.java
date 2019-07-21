@@ -1,8 +1,10 @@
 package it.fmoon.fxapp;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import it.fmoon.fxapp.components.ActivityManager;
 import it.fmoon.fxapp.controllers.application.ApplicationController;
 import it.fmoon.fxapp.events.InitializeApplication;
 import it.fmoon.fxapp.events.StartupApplication;
@@ -14,6 +16,9 @@ import javafx.stage.Stage;
 public class FxApplication extends Application {
 
 	private ConfigurableApplicationContext applicationContext;
+	
+	@Autowired
+	protected ActivityManager activityManager;
 	
 	@Override
 	public void init() throws Exception {
@@ -27,7 +32,9 @@ public class FxApplication extends Application {
 		applicationContext.publishEvent(new InitializeApplication());
 		afterInitialize();
 		applicationContext.publishEvent(new StartupApplication());
-		afterStart();		
+		activityManager.startApplication().subscribe((page)->{			
+			afterStart();	
+		});
 	}
 
 	protected void createApplicationContext() {
