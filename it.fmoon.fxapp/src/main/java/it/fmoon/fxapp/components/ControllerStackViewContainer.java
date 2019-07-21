@@ -1,4 +1,4 @@
-package it.fmoon.fxapp.controllers.application;
+package it.fmoon.fxapp.components;
 
 import io.reactivex.Single;
 import it.fmoon.fxapp.mvc.AbstractController;

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import io.reactivex.Single;
 import it.fmoon.fxapp.components.ActivityAnimator;
 import it.fmoon.fxapp.components.ActivityManager;
+import it.fmoon.fxapp.components.ControllerStackViewContainer;
+import it.fmoon.fxapp.controllers.appmenu.AppMenuController;
+import it.fmoon.fxapp.controllers.appnavbar.AppNavBarController;
 import it.fmoon.fxapp.events.InitializeApplication;
 import it.fmoon.fxapp.events.StartupApplication;
 import it.fmoon.fxapp.mvc.AbstractController;
@@ -17,6 +20,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.AnchorPane;
 
 @Component
 public class ApplicationController 
@@ -36,12 +40,21 @@ public class ApplicationController
 	@Autowired
 	ActivityAnimator activityAnimator;
 
-	@FXML
-	StackPane bodyGroup;
+	@FXML AnchorPane outerPanel;
+	
+	@FXML StackPane bodyGroup;
 
 	@FXML BorderPane sideMenuPanel;
 	
+	@Autowired
+	AppNavBarController appNavBarController;
+	
+	@Autowired
+	AppMenuController appMenuController;
+	
+	
 	private ControllerStackViewContainer csvc;
+
 
 
 	@EventListener
@@ -53,6 +66,14 @@ public class ApplicationController
 	public void onstartupApplication(StartupApplication event) {
 		activityManager.startPage(homePageDef)
 			.subscribe();
+		
+		outerPanel.getChildren().add(appNavBarController.getView());
+		sideMenuPanel.setCenter(appMenuController.getView());
+		
+		appNavBarController.onClose().subscribe(this::onClose);
+		appNavBarController.onLogin().subscribe(this::onLogin);
+		appNavBarController.onMenu().subscribe(this::onMenu);
+		
 	}
 	
 	@FXML
@@ -60,17 +81,13 @@ public class ApplicationController
 		this.csvc = new ControllerStackViewContainerHelper(()->bodyGroup, activityAnimator);
 	}
 	
-	@FXML
 	public void onClose(ActionEvent event) {
 		activityManager.stopActivity().subscribe();
 	}
-
-	@FXML
 	public void onLogin(ActionEvent event) {
 		activityManager.startActivity(login).subscribe();
 	}
-
-	@FXML public void onMenu(ActionEvent event) {
+	public void onMenu(ActionEvent event) {
 		this.sideMenuPanel.setVisible(true);
 	}
 

@@ -1,8 +1,9 @@
-package it.fmoon.fxapp.components;
+package it.fmoon.fxapp.components.impl;
 
 import org.springframework.stereotype.Component;
 
 import io.reactivex.Single;
+import it.fmoon.fxapp.components.ActivityAnimator;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.scene.Node;

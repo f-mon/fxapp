@@ -1,4 +1,4 @@
-package it.fmoon.fxapp.components;
+package it.fmoon.fxapp.components.impl;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Preconditions;
 
 import io.reactivex.Single;
-import it.fmoon.fxapp.controllers.application.ControllerStackViewContainer;
+import it.fmoon.fxapp.components.ActivityManager;
+import it.fmoon.fxapp.components.ControllerStackViewContainer;
 import it.fmoon.fxapp.mvc.Activity;
 import it.fmoon.fxapp.mvc.ActivityDef;
 import it.fmoon.fxapp.mvc.BasePageImpl;

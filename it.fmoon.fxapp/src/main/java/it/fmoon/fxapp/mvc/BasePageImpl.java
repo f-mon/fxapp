@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import io.reactivex.Single;
 import it.fmoon.fxapp.components.ActivityAnimator;
-import it.fmoon.fxapp.controllers.application.ControllerStackViewContainer;
+import it.fmoon.fxapp.components.ControllerStackViewContainer;
 import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
 import it.fmoon.fxapp.support.FxViewFactory;
 import javafx.scene.Parent;
