@@ -153,6 +153,19 @@ public class ActivityManagerImpl implements ActivityManager {
 			.map(opt->opt.get())
 			.distinctUntilChanged();
 	}
+	
+	@Override
+	public Observable<Activity> onCurrentActivity() {
+		return this.navigationStack
+			.map(navStack->navStack.isEmpty()?
+					Optional.<Page>empty():
+					Optional.of(navStack.get(navStack.size()-1)))
+			.filter(opt->opt.isPresent())
+			.map(opt->Optional.ofNullable(opt.get().getCurrentActivity()))
+			.filter(opt->opt.isPresent())
+			.map(opt->opt.get())
+			.distinctUntilChanged();
+	}
 
 	@Override
 	public void registerApplicationRootPageAndActivity(PageDef appRootPage, ActivityDef<?> appRootActivity) {
@@ -169,5 +182,7 @@ public class ActivityManagerImpl implements ActivityManager {
 	public boolean isApplicationRootActivity(ActivityDef<?> activityDef) {
 		return this.applicationRootActivity.getName().equals(activityDef.getName());
 	}
+
+
 	
 }

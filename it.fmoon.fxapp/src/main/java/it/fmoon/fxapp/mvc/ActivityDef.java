@@ -11,10 +11,27 @@ public abstract class ActivityDef<A extends Activity> {
 		this.activityType = activityType;
 	}
 
-	abstract public String getName();
+	public String getName() {
+		return this.activityType.getSimpleName();
+	}
+	
+	public String getIcon() {
+		return "fa-window-maximiz";
+	}
+	
+	public String getLabel() {
+		return getName();
+	}
 	
 	public A newActivityInstance(ApplicationContext applicationContext) {
 		return applicationContext.getBean(this.activityType,this);
+	}
+	
+	/*
+	 * If true the AppMenu is hidden when activity is shown 
+	 */
+	public boolean isFullScreen() {
+		return false;
 	}
 	
 }

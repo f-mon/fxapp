@@ -29,13 +29,5 @@
 			</children>
 		</AnchorPane>
 		
-		<BorderPane fx:id="sideMenuPanel" 
-			prefWidth="300.0"
-			visible="false" 
-			AnchorPane.bottomAnchor="0.0"
-			AnchorPane.leftAnchor="0.0" 
-			AnchorPane.topAnchor="42.0">
-		</BorderPane>
-		
 	</children>
 </AnchorPane>

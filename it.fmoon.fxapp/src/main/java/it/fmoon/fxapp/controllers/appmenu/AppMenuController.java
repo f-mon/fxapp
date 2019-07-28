@@ -5,28 +5,41 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import it.fmoon.fxapp.components.ActivityManager;
+import it.fmoon.fxapp.components.FxLoader;
 import it.fmoon.fxapp.components.menu.ActivityMenuItem;
 import it.fmoon.fxapp.components.menu.AppMenuItem;
 import it.fmoon.fxapp.components.menu.MenuManager;
 import it.fmoon.fxapp.components.menu.PageMenuItem;
+import it.fmoon.fxapp.controllers.application.AppMenuState;
 import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.mvc.ActivityDef;
 import it.fmoon.fxapp.mvc.PageDef;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.layout.Region;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 @Component
 public class AppMenuController extends AbstractController {
 
+	private static final double WIDTH = 300D;
+	private static final double WIDTH_IN_BARMODE = 60D;
+	
 	public enum AppMenuViewState {
 		APPLICATION_MENU, PAGE_MENU
 	}
 
+	private PublishSubject<ActionEvent> onToggleMenuMode = PublishSubject.create();
+	
+	private AppMenuState currentState;
 	private AppMenuViewState appMenuViewState = AppMenuViewState.PAGE_MENU;
 
 	@FXML
@@ -40,6 +53,9 @@ public class AppMenuController extends AbstractController {
 
 	@Autowired
 	private ActivityManager activityManager;
+
+	@Autowired
+	private FxLoader loader;
 
 	@FXML
 	public void initialize() {
@@ -63,7 +79,11 @@ public class AppMenuController extends AbstractController {
 				: AppMenuViewState.APPLICATION_MENU;
 		
 		updateStateView();
-		
+	}
+	
+	@FXML
+	public void onChangeMenuMode(ActionEvent event) {
+		this.onToggleMenuMode.onNext(event);
 	}
 	
 	private void updateStateView() {
@@ -83,31 +103,33 @@ public class AppMenuController extends AbstractController {
 		menuPanel.getChildren().clear();
 		appMenuList.forEach(menuItem -> {
 			if (menuItem instanceof ActivityMenuItem) {
-				Region view = createActivityMenuItemView((ActivityMenuItem) menuItem,isPageMenu);
+				Node view = createActivityMenuItemView((ActivityMenuItem) menuItem,isPageMenu);
 				menuPanel.getChildren().add(view);
 			} else if (menuItem instanceof PageMenuItem) {
-				Region view = createPageMenuItemView((PageMenuItem) menuItem,isPageMenu);
+				Node view = createPageMenuItemView((PageMenuItem) menuItem,isPageMenu);
 				menuPanel.getChildren().add(view);
 			}
 		});
 	}
 
-	protected Region createPageMenuItemView(PageMenuItem menuItem, boolean isPageMenu) {
+	protected Node createPageMenuItemView(PageMenuItem menuItem, boolean isPageMenu) {
 		PageDef pageDef = menuItem.getPageDef();
-		Button button = new Button("Page: " + menuItem.getLabel());
-		button.setOnAction((ActionEvent e) -> {
+		Parent menuItemV = loader.loadView(this,"AppMenuItem");
+		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
+		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 			onPageMenuItemClick(menuItem,pageDef,isPageMenu);
 		});
-		return button;
+		return menuItemV;
 	}
 
-	protected Region createActivityMenuItemView(ActivityMenuItem menuItem, boolean isPageMenu) {
+	protected Node createActivityMenuItemView(ActivityMenuItem menuItem, boolean isPageMenu) {
 		ActivityDef<?> activityDef = menuItem.getActivityDef();
-		Button button = new Button("Activity: " + menuItem.getLabel());
-		button.setOnAction((ActionEvent e) -> {
+		Parent menuItemV = loader.loadView(this,"AppMenuItem");
+		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
+		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 			onActivityMenuItemClick(menuItem,activityDef,isPageMenu);
 		});
-		return button;
+		return menuItemV;
 	}
 
 	protected void onActivityMenuItemClick(ActivityMenuItem menuItem, ActivityDef<?> activityDef, boolean isPageMenu) {
@@ -124,5 +146,28 @@ public class AppMenuController extends AbstractController {
 		} else {
 			activityManager.startRootPage(pageDef).subscribe();
 		}
+	}
+
+	public Observable<ActionEvent> onToggleMenuMode() {
+		return this.onToggleMenuMode;
+	}
+
+	public AppMenuState getCurrentState() {
+		return currentState;
+	}
+	public void setCurrentState(AppMenuState menuState) {
+		this.currentState = menuState;
+		if (this.currentState.isBars()) {
+			((BorderPane)this.getView()).setMaxWidth(WIDTH_IN_BARMODE);
+		} else {
+			((BorderPane)this.getView()).setMaxWidth(WIDTH);
+		}
+	}
+
+	public double getWidth() {
+		if (this.currentState.isBars()) {
+			return WIDTH_IN_BARMODE;
+		}
+		return WIDTH;
 	}
 }

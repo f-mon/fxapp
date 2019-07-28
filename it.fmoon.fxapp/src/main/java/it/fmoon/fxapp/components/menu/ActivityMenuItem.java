@@ -1,5 +1,7 @@
 package it.fmoon.fxapp.components.menu;
 
+import com.google.common.base.MoreObjects;
+
 import it.fmoon.fxapp.mvc.ActivityDef;
 
 public class ActivityMenuItem extends AppMenuItem {
@@ -31,7 +33,9 @@ public class ActivityMenuItem extends AppMenuItem {
 		
 		@Override
 		public ActivityMenuItem build() {
-			return new ActivityMenuItem(activityDef,this.label,this.icon);
+			return new ActivityMenuItem(activityDef,
+				MoreObjects.firstNonNull(this.label,activityDef.getLabel()),
+				MoreObjects.firstNonNull(this.icon,activityDef.getIcon()));
 		}
 		
 	}

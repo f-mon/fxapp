@@ -8,7 +8,9 @@ import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
 
+import it.fmoon.fxapp.components.menu.ActivityMenuItem;
 import it.fmoon.fxapp.components.menu.AppMenuItem;
+import it.fmoon.fxapp.components.menu.AppMenus;
 
 public abstract class PageDef {
 
@@ -35,9 +37,23 @@ public abstract class PageDef {
 		return applicationContext.getBean(this.pageType,this);
 	}
 	
-	abstract public ActivityDef<?> getInitialActivity();
+	public ActivityDef<?> getInitialActivity() {
+		return AppMenus.findFirstActivity(pageMenuDefinition)
+			.map(ActivityMenuItem::getActivityDef)
+			.get();
+	}
 	
 	public List<AppMenuItem> getPageMenu() {
 		return pageMenuDefinition;
 	}
+	
+	public String getLabel() {
+		return getName();
+	}
+	public String getIcon() {
+		return "fa-file-o";
+	}
+	
+	
+	
 }

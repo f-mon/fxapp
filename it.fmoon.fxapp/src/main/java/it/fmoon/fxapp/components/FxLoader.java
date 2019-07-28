@@ -25,8 +25,12 @@ public class FxLoader {
 			viewName = viewName.substring(0, viewName.length()-8);
 		}
 		viewName = viewName + "View";
+		return loadView(controller, viewName);
+	}
+
+	public Parent loadView(Object baseResorceObj, String viewName) {
 		System.out.println("load view: "+viewName);
-		FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(viewName+".fxml"));
+		FXMLLoader loader = new FXMLLoader(baseResorceObj.getClass().getResource(viewName+".fxml"));
         loader.setControllerFactory(applicationContext::getBean);
         Parent viewNode;
         try {
@@ -36,5 +40,6 @@ public class FxLoader {
 		}
 		return viewNode;
 	}
+
 
 }
