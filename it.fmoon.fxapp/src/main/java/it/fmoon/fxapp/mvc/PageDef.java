@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import it.fmoon.fxapp.components.menu.ActivityMenuItem;
 import it.fmoon.fxapp.components.menu.AppMenuItem;
 import it.fmoon.fxapp.components.menu.AppMenus;
+import it.fmoon.fxapp.support.NamesUtils;
 
 public abstract class PageDef {
 
@@ -25,7 +26,9 @@ public abstract class PageDef {
 		this.pageMenuDefinition = Lists.newArrayList();
 	}
 	
-	abstract public String getName();
+	public String getName() {
+		return NamesUtils.pageNameFromPageDefName(this.getClass().getSimpleName());
+	}
 	
 	@PostConstruct
 	protected void initializePageDef() {

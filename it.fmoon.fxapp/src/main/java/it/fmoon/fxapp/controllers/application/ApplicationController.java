@@ -19,8 +19,9 @@ import it.fmoon.fxapp.events.StartupApplication;
 import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.mvc.Activity;
 import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
+import it.fmoon.fxapp.support.HttpJsonClient;
 import it.fmoon.fxapp.system.home.HomeActivityDef;
-import it.fmoon.fxapp.system.homepage.HomePageDef;
+import it.fmoon.fxapp.system.home.HomePageDef;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -28,7 +29,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
@@ -67,6 +74,9 @@ public class ApplicationController
 	
 	@Autowired
 	UserInfoController userInfoController;
+	
+	@Autowired
+	HttpJsonClient httpJsonClient;
 		
 	
 	private ObjectProperty<AppMenuState> appMenuState;
@@ -83,7 +93,20 @@ public class ApplicationController
 	
 	@FXML
 	public void initialize() {
+		
 		this.csvc = new ControllerStackViewContainerHelper(()->bodyGroup, activityAnimator);
+		
+		httpJsonClient.sendAndReadValue(
+				"https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US",
+				"images",0,"url")
+			.subscribe(url->{
+				
+				BackgroundImage bingBackground= new BackgroundImage(new Image("https://www.bing.com"+url),
+						BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+						BackgroundSize.DEFAULT);
+				bodyPanel.setBackground(new Background(bingBackground));
+			});
+		
 	}
 
 	@EventListener
