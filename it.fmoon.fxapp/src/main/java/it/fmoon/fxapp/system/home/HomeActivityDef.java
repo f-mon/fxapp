@@ -12,9 +12,8 @@ public class HomeActivityDef extends ActivityDef<HomeActivity> {
 	}
 
 	@Override
-	public String getName() {
-		return "homeActivity";
+	public boolean isFullScreen() {
+		return true;
 	}
-
 	
 }

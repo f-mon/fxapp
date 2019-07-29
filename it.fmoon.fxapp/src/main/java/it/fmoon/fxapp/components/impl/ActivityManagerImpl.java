@@ -57,6 +57,7 @@ public class ActivityManagerImpl implements ActivityManager {
 				notifyNavStack();
 				
 				basePageImpl.setClosedPageHandler((page,stopOptions)->completeClosingPage(page,stopOptions));
+				
 				return stackViewContainer.showStartedControllerView(basePageImpl)
 					.flatMap(r2->basePageImpl.doStartPage());
 			});
@@ -64,8 +65,24 @@ public class ActivityManagerImpl implements ActivityManager {
 	
 	@Override
 	public Single<Page> startRootPage(PageDef pageDef) {
-		// TODO Auto-generated method stub
-		return null;
+		return stopAllPages()
+			.flatMap(page->startPage(pageDef));
+	}
+
+	private Single<Boolean> stopAllPages() {
+		if (pagesStack.isEmpty()) {
+			return Single.just(Boolean.TRUE);
+		}
+		return stopPage(new StopOptions(true,true,false,false))
+			.flatMap(opt->Single.just(Boolean.TRUE));
+	}
+
+	private Single<Optional<Page>> stopPage(StopOptions stopOptions) {
+		if (!pagesStack.isEmpty()) {
+			BasePageImpl toStop = pagesStack.getLast();
+			return toStop.doStopPage(stopOptions);
+		}
+		return Single.just(Optional.empty());
 	}
 
 	private Single<Optional<Activity>> completeClosingPage(BasePageImpl closedPage,StopOptions stopOptions) {
@@ -77,6 +94,11 @@ public class ActivityManagerImpl implements ActivityManager {
 			return stackViewContainer.showResumedControllerView(toResume)
 				.flatMap(view->toResume.doResumePage());
 		}
+		else if (stopOptions.isCheckRestartAppRootPage() && pagesStack.isEmpty()) {
+			return startApplication()
+				.flatMap(p->Single.just(Optional.of(p.getCurrentActivity())));
+		}
+		
 		return Single.just(Optional.empty());
 	}
 
@@ -129,7 +151,20 @@ public class ActivityManagerImpl implements ActivityManager {
 					Optional.of(navStack.get(navStack.size()-1)))
 			.filter(opt->opt.isPresent())
 			.map(opt->opt.get())
-			.distinct();
+			.distinctUntilChanged();
+	}
+	
+	@Override
+	public Observable<Activity> onCurrentActivity() {
+		return this.navigationStack
+			.map(navStack->navStack.isEmpty()?
+					Optional.<Page>empty():
+					Optional.of(navStack.get(navStack.size()-1)))
+			.filter(opt->opt.isPresent())
+			.map(opt->Optional.ofNullable(opt.get().getCurrentActivity()))
+			.filter(opt->opt.isPresent())
+			.map(opt->opt.get())
+			.distinctUntilChanged();
 	}
 
 	@Override
@@ -147,5 +182,7 @@ public class ActivityManagerImpl implements ActivityManager {
 	public boolean isApplicationRootActivity(ActivityDef<?> activityDef) {
 		return this.applicationRootActivity.getName().equals(activityDef.getName());
 	}
+
+
 	
 }

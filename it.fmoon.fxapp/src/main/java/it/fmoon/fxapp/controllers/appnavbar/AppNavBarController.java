@@ -148,23 +148,28 @@ public class AppNavBarController
 		}
 
 		private void updateMenuIcon(AppMenuState appMenuState) {
-			FontIcon fontIcon = new FontIcon(stateToIcon(appMenuState));
-			fontIcon.setIconSize(24);
-			fontIcon.setFill(Color.WHITESMOKE);		
-			
-			this.menuButton.setGraphic(fontIcon);
+			if (appMenuState.isHidden()) {
+				this.menuButton.setVisible(false);
+			} else {
+				this.menuButton.setVisible(true);
+				FontIcon fontIcon = new FontIcon(stateToIcon(appMenuState));
+				fontIcon.setIconSize(24);
+				fontIcon.setFill(Color.WHITESMOKE);
+				this.menuButton.setGraphic(fontIcon);
+			}
 		}
 
 		private FontAwesome stateToIcon(AppMenuState newValue) {
-			switch (newValue) {
-			case CLOSED:
-				return FontAwesome.BARS;
-			case OPEN_OVERLAY: 
-				return FontAwesome.CHEVRON_DOWN;
-			case OPEN_MOUNTED: 
-				return FontAwesome.CHEVRON_LEFT;
-			}
-			return null;
+			return FontAwesome.BARS;
+//			switch (newValue) {
+//			case CLOSED:
+//				return FontAwesome.BARS;
+//			case OPEN_OVERLAY: 
+//				return FontAwesome.CHEVRON_DOWN;
+//			case OPEN_MOUNTED: 
+//				return FontAwesome.CHEVRON_LEFT;
+//			}
+//			return null;
 		}
 		
 }

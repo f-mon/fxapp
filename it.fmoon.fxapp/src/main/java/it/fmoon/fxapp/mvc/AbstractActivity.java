@@ -16,6 +16,7 @@ public abstract class AbstractActivity<D extends ActivityDef<?>>
 	private Page page;
 	
 	protected String title;
+	private String icon;
 	
 	public AbstractActivity(D def) {
 		this.activityDef = def;
@@ -24,11 +25,15 @@ public abstract class AbstractActivity<D extends ActivityDef<?>>
 	@PostConstruct
 	public void initializeActivity() {
 		initTitle();
+		initIcon();
 	}
 	
-	
+	protected void initIcon() {
+		this.icon = this.activityDef.getIcon();
+	}
+
 	protected void initTitle() {
-		this.title = this.activityDef.getName();
+		this.title = this.activityDef.getLabel();
 	}
 
 	public D getActivityDef() {
@@ -42,6 +47,10 @@ public abstract class AbstractActivity<D extends ActivityDef<?>>
 
 	public String getTitle() {
 		return title;
+	}
+	
+	public String getIcon() {
+		return icon;
 	}
 
 	public Activity getParentActivity() {

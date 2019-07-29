@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import it.fmoon.fxapp.support.NamesUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
@@ -17,16 +18,13 @@ public class FxLoader {
 	
 	public Parent loadView(Object controller) {
 		String controllerName = controller.getClass().getSimpleName();
-		String viewName = controllerName;
-		if (viewName.endsWith("Controller")) {
-			viewName = viewName.substring(0, viewName.length()-10);
-		}
-		if (viewName.endsWith("Activity")) {
-			viewName = viewName.substring(0, viewName.length()-8);
-		}
-		viewName = viewName + "View";
+		String viewName = NamesUtils.viewNameFromControllerName(controllerName);
+		return loadView(controller, viewName);
+	}
+
+	public Parent loadView(Object baseResorceObj, String viewName) {
 		System.out.println("load view: "+viewName);
-		FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(viewName+".fxml"));
+		FXMLLoader loader = new FXMLLoader(baseResorceObj.getClass().getResource(viewName+".fxml"));
         loader.setControllerFactory(applicationContext::getBean);
         Parent viewNode;
         try {
@@ -36,5 +34,6 @@ public class FxLoader {
 		}
 		return viewNode;
 	}
+
 
 }

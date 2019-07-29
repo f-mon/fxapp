@@ -12,8 +12,8 @@ public class LoginActivityDef extends ActivityDef<LoginActivity> {
 	}
 
 	@Override
-	public String getName() {
-		return "loginActivity";
+	public boolean isFullScreen() {
+		return true;
 	}
 	
 }

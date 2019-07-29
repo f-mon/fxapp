@@ -1,5 +1,7 @@
 package it.fmoon.fxapp.components.menu;
 
+import com.google.common.base.MoreObjects;
+
 import it.fmoon.fxapp.mvc.PageDef;
 
 public class PageMenuItem extends AppMenuItem {
@@ -30,7 +32,9 @@ public class PageMenuItem extends AppMenuItem {
 		
 		@Override
 		public PageMenuItem build() {
-			return new PageMenuItem(pageDef,this.label,this.icon);
+			return new PageMenuItem(pageDef,
+				MoreObjects.firstNonNull(this.label,pageDef.getLabel()),
+				MoreObjects.firstNonNull(this.icon,pageDef.getIcon()));
 		}
 		
 	}

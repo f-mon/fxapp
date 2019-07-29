@@ -15,9 +15,7 @@
 	style="-fx-background-color: blue;">
 	<center>
 		<StackPane fx:id="bodyGroup" >
-			<padding>
-				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-			</padding>
+
 		</StackPane>
 	
 	<!-- 
@@ -29,12 +27,18 @@
 		-->
 	</center>
 	<bottom>
-		<ButtonBar prefHeight="40.0" BorderPane.alignment="CENTER"
-			style="-fx-background-color: black;">
+		<ButtonBar prefHeight="40.0" style="-fx-background-color: black;">
 			<buttons>
-				<Button ButtonBar.buttonData="LEFT" contentDisplay="LEFT" maxWidth="40.0"
-					minWidth="40.0" mnemonicParsing="false" onAction="#onHomeMenu"
-					prefWidth="50.0"
+				<Button ButtonBar.buttonData="LEFT" onAction="#onChangeMenuMode"
+					style="-fx-background-color: transparent; -fx-cursor: hand;"
+					>
+					<graphic>
+						<FontIcon iconColor="WHITE" iconLiteral="fa-indent"
+							iconSize="24" />
+					</graphic>
+				</Button>
+				
+				<Button ButtonBar.buttonData="RIGHT" onAction="#onHomeMenu"
 					style="-fx-background-color: transparent; -fx-cursor: hand;"
 					>
 					<graphic>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<HBox alignment="CENTER" minHeight="40" 
+	style="-fx-background-color: white; -fx-border-width: 0 0 1 0; -fx-border-color: gray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <FontIcon />
+      <Label text="Label" fx:id="label"/>
+      <FontIcon />
+   </children>
+</HBox>

@@ -37,5 +37,7 @@ public interface ActivityManager {
 	public Observable<List<Page>> onNavigationStack();
 
 	public Observable<Page> onCurrentPage();
+	
+	public Observable<Activity> onCurrentActivity();
 
 }

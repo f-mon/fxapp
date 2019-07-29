@@ -42,21 +42,30 @@ public class BasePageImpl
 		private boolean checkClosePage;
 		private boolean preventCloseAppRootActivity;
 		private boolean checkResumePage = true;
+		private boolean checkRestartAppRootPage;
 		
 		public StopOptions(boolean checkResume,boolean checkClosePage) {
 			this(checkResume,checkClosePage,true);
 		}
 		public StopOptions(boolean checkResume,boolean checkClosePage,boolean preventCloseAppRootActivity) {
+			this(checkResume,checkClosePage,preventCloseAppRootActivity,true);
+		}
+		public StopOptions(boolean checkResume,boolean checkClosePage,boolean preventCloseAppRootActivity,
+				boolean checkRestartAppRootPage) {
 			this.checkResume = checkResume;
 			this.checkClosePage = checkClosePage;
 			this.preventCloseAppRootActivity = preventCloseAppRootActivity;
+			this.checkRestartAppRootPage = checkRestartAppRootPage;
 		}
-
+		
 		public boolean isCheckResumePage() {
 			return this.checkResumePage;
 		}
 		public boolean isPreventCloseAppRootActivity() {
 			return this.preventCloseAppRootActivity;
+		}
+		public boolean isCheckRestartAppRootPage() {
+			return this.checkRestartAppRootPage;
 		}
 
 	}
@@ -134,8 +143,9 @@ public class BasePageImpl
 	}
 	
 	public boolean isOnApplicationRootActivity() {
-		return isApplicationRootPage() && 
-			this.isOnPageRootActivity() &&
+		return isRootPage() &&
+			isApplicationRootPage() && 
+			isOnPageRootActivity() &&
 			this.activityManager.isApplicationRootActivity(this.getCurrentActivity().getActivityDef());
 	}
 	
@@ -164,6 +174,12 @@ public class BasePageImpl
 			.flatMap(act->Single.just(this));
 	}
 	
+	public Single<Optional<Page>> doStopPage(StopOptions stopOptions) {
+		return stopAllActivities(stopOptions)
+			.flatMap(page->Single.just(Optional.of(page)));
+	}
+	
+	
 	public Single<Optional<Activity>> doResumePage() {
 		return checkResumeActivity();
 	}
@@ -185,16 +201,16 @@ public class BasePageImpl
 	}
 	
 	public Single<Activity> startRootActivity(ActivityDef<?> activityDef) {
-		return stopAllActivities()
+		return stopAllActivities(new StopOptions(true,false,false))
 			.flatMap(page->startActivity(activityDef));
 	}
 
-	public Single<Page> stopAllActivities() {
+	public Single<Page> stopAllActivities(StopOptions stopOptions) {
 		if (activityStack.isEmpty()) {
 			return Single.just(this);
 		}
-		return stopActivity(new StopOptions(true,false,false))
-			.flatMap(stopped->stopAllActivities());
+		return stopActivity(stopOptions)
+			.flatMap(stopped->stopAllActivities(stopOptions));
 	}
 	
 	public Single<Optional<Activity>> stopActivity() {
@@ -270,6 +286,5 @@ public class BasePageImpl
 	public Observable<List<AppMenuItem>> getPageMenuObs() {
 		return this.pageMenuSubject;
 	}
-
 
 }
