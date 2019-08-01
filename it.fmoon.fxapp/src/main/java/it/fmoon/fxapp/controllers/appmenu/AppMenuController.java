@@ -2,6 +2,7 @@ package it.fmoon.fxapp.controllers.appmenu;
 
 import java.util.List;
 
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -114,8 +115,9 @@ public class AppMenuController extends AbstractController {
 
 	protected Node createPageMenuItemView(PageMenuItem menuItem, boolean isPageMenu) {
 		PageDef pageDef = menuItem.getPageDef();
-		Parent menuItemV = loader.loadView(this,"AppMenuItem");
+		Node menuItemV = loader.loadView(this,"AppMenuItem");
 		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
+		((FontIcon)menuItemV.lookup("#icon")).setIconLiteral(menuItem.getIcon());
 		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 			onPageMenuItemClick(menuItem,pageDef,isPageMenu);
 		});
@@ -124,8 +126,9 @@ public class AppMenuController extends AbstractController {
 
 	protected Node createActivityMenuItemView(ActivityMenuItem menuItem, boolean isPageMenu) {
 		ActivityDef<?> activityDef = menuItem.getActivityDef();
-		Parent menuItemV = loader.loadView(this,"AppMenuItem");
+		Node menuItemV = loader.loadView(this,"AppMenuItem");
 		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
+		((FontIcon)menuItemV.lookup("#icon")).setIconLiteral(menuItem.getIcon());
 		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 			onActivityMenuItemClick(menuItem,activityDef,isPageMenu);
 		});

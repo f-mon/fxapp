@@ -1,9 +1,9 @@
 package it.fmoon.fxapp.support;
 
-import javafx.scene.Parent;
+import javafx.scene.Node;
 
 public interface FxViewFactory {
 	
-	Parent createView();
+	Node createView();
 	
 }

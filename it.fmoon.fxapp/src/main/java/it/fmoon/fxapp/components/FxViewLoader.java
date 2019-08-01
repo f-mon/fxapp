@@ -5,21 +5,21 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import it.fmoon.fxapp.support.FxViewFactory;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FxViewLoader {
 
 	private FxLoader fxLoader;
-	private Parent view;
+	private Node view;
 
 	public FxViewLoader(FxLoader fxLoader) {
 		super();
 		this.fxLoader = fxLoader;
 	}
 
-	public Parent get(Object controller) {
+	public Node get(Object controller) {
 		if (this.view==null) {
 			if (controller instanceof FxViewFactory) {
 				this.view = ((FxViewFactory) controller).createView();
@@ -30,6 +30,9 @@ public class FxViewLoader {
 		return this.view;
 	}
 	
+	public FxLoader loader() {
+		return this.fxLoader;
+	}
 	
 	
 }

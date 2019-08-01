@@ -9,6 +9,7 @@ import it.fmoon.fxapp.controllers.application.ApplicationController;
 import it.fmoon.fxapp.events.InitializeApplication;
 import it.fmoon.fxapp.events.StartupApplication;
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -54,9 +55,9 @@ public class FxApplication extends Application {
 		//primaryStage.initStyle(StageStyle.UNDECORATED);
 		
 		ApplicationController appCtrl = applicationContext.getBean(ApplicationController.class);
-		Parent root = appCtrl.getView();
+		Node root = appCtrl.getView();
 		//WindowStyle.allowDrag(root, primaryStage);
-		primaryStage.setScene(new Scene(root));
+		primaryStage.setScene(new Scene((Parent)root));
 		primaryStage.show();
 	}
 	

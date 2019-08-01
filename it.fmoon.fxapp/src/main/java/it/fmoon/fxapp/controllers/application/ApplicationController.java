@@ -27,7 +27,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
@@ -104,7 +103,7 @@ public class ApplicationController
 				BackgroundImage bingBackground= new BackgroundImage(new Image("https://www.bing.com"+url),
 						BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
 						BackgroundSize.DEFAULT);
-				bodyPanel.setBackground(new Background(bingBackground));
+				outerPanel.setBackground(new Background(bingBackground));
 			});
 		
 	}
@@ -123,7 +122,7 @@ public class ApplicationController
 	}
 	
 	protected void setupNavBar() {
-		Parent navBar = appNavBarController.getView();
+		Node navBar = appNavBarController.getView();
 		outerPanel.getChildren().add(navBar);
 		AnchorPane.setTopAnchor(navBar,0.0);
 		AnchorPane.setLeftAnchor(navBar,0.0);

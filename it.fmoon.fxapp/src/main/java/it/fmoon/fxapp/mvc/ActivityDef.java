@@ -16,7 +16,7 @@ public abstract class ActivityDef<A extends Activity> {
 	}
 	
 	public String getIcon() {
-		return "fa-window-maximiz";
+		return "fa-window-maximize";
 	}
 	
 	public String getLabel() {

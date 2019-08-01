@@ -19,7 +19,6 @@ import it.fmoon.fxapp.mvc.ActivityDef;
 import it.fmoon.fxapp.mvc.PageDef;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -66,7 +65,7 @@ public class HomeActivity extends AbstractActivity<HomeActivityDef> {
 	
 	protected Node createPageHomeIconView(PageMenuItem menuItem) {
 		PageDef pageDef = menuItem.getPageDef();
-		Parent menuItemV = loader.loadView(this,"HomeButtonItem");
+		Node menuItemV = loader.loadView(this,"HomeButtonItem");
 		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
 		((FontIcon)menuItemV.lookup("#icon")).setIconLiteral(menuItem.getIcon());
 		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
@@ -77,7 +76,7 @@ public class HomeActivity extends AbstractActivity<HomeActivityDef> {
 
 	protected Node createActivityHomeIconView(ActivityMenuItem menuItem) {
 		ActivityDef<?> activityDef = menuItem.getActivityDef();
-		Parent menuItemV = loader.loadView(this,"HomeButtonItem");
+		Node menuItemV = loader.loadView(this,"HomeButtonItem");
 		((Label)menuItemV.lookup("#label")).setText(menuItem.getLabel());
 		((FontIcon)menuItemV.lookup("#icon")).setIconLiteral(menuItem.getIcon());
 		menuItemV.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {

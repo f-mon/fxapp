@@ -61,6 +61,4 @@ public abstract class AbstractActivity<D extends ActivityDef<?>>
 		return this.page;
 	}
 	
-
-	
 }

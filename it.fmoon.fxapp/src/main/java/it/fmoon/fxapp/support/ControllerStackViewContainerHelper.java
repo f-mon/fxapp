@@ -7,7 +7,6 @@ import it.fmoon.fxapp.components.ActivityAnimator;
 import it.fmoon.fxapp.components.ControllerStackViewContainer;
 import it.fmoon.fxapp.mvc.AbstractController;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
 public class ControllerStackViewContainerHelper implements ControllerStackViewContainer {
@@ -23,7 +22,7 @@ public class ControllerStackViewContainerHelper implements ControllerStackViewCo
 
 
 	public Single<Boolean> pauseControllerView(AbstractController ac) {
-		Parent view = ac.getView();
+		Node view = ac.getView();
 		StackPane parent = this.parentSupplier.get();
 		if (parent.getChildren().contains(view)) {
 			return activityAnimator.removeAnimate((Node) view, parent,true)
@@ -33,7 +32,7 @@ public class ControllerStackViewContainerHelper implements ControllerStackViewCo
 	}
 	
 	public Single<Boolean> removeStoppedControllerView(AbstractController ac) {
-		Parent view = ac.getView();
+		Node view = ac.getView();
 		StackPane parent = this.parentSupplier.get();
 		if (parent.getChildren().contains(view)) {
 			return activityAnimator.removeAnimate((Node) view, parent,false)
@@ -44,7 +43,7 @@ public class ControllerStackViewContainerHelper implements ControllerStackViewCo
 
 
 	public Single<Boolean> showStartedControllerView(AbstractController ac) {
-		Parent view = ac.getView();
+		Node view = ac.getView();
 		StackPane parent = this.parentSupplier.get();
 		if (!parent.getChildren().contains(view)) {
 			return activityAnimator.insertAnimate((Node) view, parent,false)
@@ -54,7 +53,7 @@ public class ControllerStackViewContainerHelper implements ControllerStackViewCo
 	}
 
 	public Single<Boolean> showResumedControllerView(AbstractController ac) {
-		Parent view = ac.getView();
+		Node view = ac.getView();
 		StackPane parent = this.parentSupplier.get();
 		if (!parent.getChildren().contains(view)) {
 			return activityAnimator.insertAnimate((Node) view, parent,true)

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 
+@SuppressWarnings("serial")
 public class UncheckedObjectMapper extends com.fasterxml.jackson.databind.ObjectMapper {
 	
     public Map<String,Object> readValue(String content) {

@@ -10,7 +10,7 @@
 	xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="it.fmoon.fxapp.controllers.appnavbar.AppNavBarController"
 	fx:id="navBar"
-	style="-fx-background-color: blue;">
+	style="-fx-background-color: rgba(5, 29, 184, 0.41);">
 	<children>
 		<Button contentDisplay="RIGHT" maxWidth="40.0" minWidth="40.0"
 			mnemonicParsing="false" onAction="#onMenu" prefWidth="50.0"

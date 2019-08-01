@@ -4,17 +4,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="it.fmoon.fxapp.controllers.appmenu.AppMenuController"
-	style="-fx-background-color: blue;">
-	<center>
-		<StackPane fx:id="bodyGroup" >
+<BorderPane style="-fx-background-color: rgba(5, 29, 184, 0.41);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.fmoon.fxapp.controllers.appmenu.AppMenuController">
+	<center>		
+		<StackPane fx:id="bodyGroup" prefHeight="252.0" prefWidth="197.0">
+		   <padding>
+		      <Insets right="5.0" />
+		   </padding>
 
 		</StackPane>
 	
@@ -28,22 +26,19 @@
 	</center>
 	<bottom>
 		<ButtonBar prefHeight="40.0" style="-fx-background-color: black;">
+		   <padding>
+		      <Insets right="2.0" />
+		   </padding>
 			<buttons>
-				<Button ButtonBar.buttonData="LEFT" onAction="#onChangeMenuMode"
-					style="-fx-background-color: transparent; -fx-cursor: hand;"
-					>
+				<Button onAction="#onChangeMenuMode" style="-fx-background-color: transparent; -fx-cursor: hand;" ButtonBar.buttonData="LEFT">
 					<graphic>
-						<FontIcon iconColor="WHITE" iconLiteral="fa-indent"
-							iconSize="24" />
+						<FontIcon iconColor="WHITE" iconLiteral="fa-indent" iconSize="24" />
 					</graphic>
 				</Button>
 				
-				<Button ButtonBar.buttonData="RIGHT" onAction="#onHomeMenu"
-					style="-fx-background-color: transparent; -fx-cursor: hand;"
-					>
+				<Button onAction="#onHomeMenu" style="-fx-background-color: transparent; -fx-cursor: hand;" ButtonBar.buttonData="RIGHT">
 					<graphic>
-						<FontIcon iconColor="WHITE" iconLiteral="fa-home"
-							iconSize="24" />
+						<FontIcon iconColor="WHITE" iconLiteral="fa-home" iconSize="24" />
 					</graphic>
 				</Button>
 			</buttons>
