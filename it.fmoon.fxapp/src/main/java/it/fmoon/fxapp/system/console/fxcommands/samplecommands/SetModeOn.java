@@ -2,9 +2,9 @@ package it.fmoon.fxapp.system.console.fxcommands.samplecommands;
 
 import org.springframework.stereotype.Component;
 
-import it.fmoon.fxapp.system.console.fxcommands.FxSelectOneCommand;
+import it.fmoon.fxapp.system.console.fxcommands.FxToggleCommand;
 
 @Component
-public class SelectPatient implements FxSelectOneCommand {
+public class SetModeOn implements FxToggleCommand {
 
 }

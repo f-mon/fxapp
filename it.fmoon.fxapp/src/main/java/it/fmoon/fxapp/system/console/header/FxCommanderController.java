@@ -12,12 +12,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets.SetView;
 
 import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.support.ViewUtils;
 import it.fmoon.fxapp.system.console.fxcommands.CommandsQuery;
+import it.fmoon.fxapp.system.console.fxcommands.FxCommand;
 import it.fmoon.fxapp.system.console.fxcommands.FxCommandService;
+import it.fmoon.fxapp.system.console.fxcommands.FxToggleCommand;
 import it.fmoon.fxapp.system.console.fxcommands.SuggestionItem;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -43,7 +46,7 @@ public class FxCommanderController extends AbstractController {
 	private BehaviorSubject<List<SuggestionItem>> currentSuggestions = BehaviorSubject.createDefault(Collections.emptyList());
 	
 	private ObjectProperty<SuggestionItem> focusedSuggestion = new SimpleObjectProperty<SuggestionItem>(null);
-	private ObjectProperty<CommandsQuery> commandsQuery = new SimpleObjectProperty<CommandsQuery>(new CommandsQuery(null));
+	private ObjectProperty<CommandsQuery> commandsQuery = new SimpleObjectProperty<CommandsQuery>(new CommandsQuery());
 	
 	private VBox suggestionsList;
 	
@@ -103,7 +106,19 @@ public class FxCommanderController extends AbstractController {
 
 
 	private void selectFocusedItem() {
-		
+		SuggestionItem suggestionItem = this.focusedSuggestion.get();
+		if (suggestionItem!=null) {
+			FxCommand suggestedCommand = suggestionItem.getSuggestedCommand();
+			CommandsQuery commandsQuery = this.commandsQuery.get();
+			activateCommand(commandsQuery,suggestedCommand);
+		}
+	}
+
+
+	private void activateCommand(CommandsQuery query, FxCommand activatedCommand) {
+		if (activatedCommand instanceof FxToggleCommand) {
+			this.commandsQuery.setValue(query.toggleFlagValue(activatedCommand.getName()));
+		}
 	}
 
 
