@@ -22,6 +22,8 @@ import it.fmoon.fxapp.support.ControllerStackViewContainerHelper;
 import it.fmoon.fxapp.support.HttpJsonClient;
 import it.fmoon.fxapp.system.home.HomeActivityDef;
 import it.fmoon.fxapp.system.home.HomePageDef;
+import javafx.animation.Animation;
+import javafx.animation.Transition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -37,6 +39,8 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 @Component
 public class ApplicationController 
@@ -123,6 +127,8 @@ public class ApplicationController
 	
 	protected void setupNavBar() {
 		Node navBar = appNavBarController.getView();
+		DropShadow shadow1 = new DropShadow(10,Color.BLACK);
+		navBar.setEffect(shadow1);
 		outerPanel.getChildren().add(navBar);
 		AnchorPane.setTopAnchor(navBar,0.0);
 		AnchorPane.setLeftAnchor(navBar,0.0);
@@ -131,20 +137,29 @@ public class ApplicationController
 		appNavBarController.onClose().subscribe(this::onClose);
 		appNavBarController.onLogin().subscribe(this::onLogin);
 		appNavBarController.onMenu().subscribe(this::onMenuToggle);
+		appNavBarController.getNavBarHeight().addListener((obj,oldVval,newVal)->{
+			AnchorPane.setTopAnchor(this.appMenuView,getNavBarHeight());
+			AnchorPane.setTopAnchor(this.bodyPanel,getNavBarHeight());
+		});
+		AnchorPane.setTopAnchor(this.bodyPanel,getNavBarHeight());
 	}
 	
 	protected void  setupAppMenu() {
 		this.appMenuView = (Pane)appMenuController.getView();
 		outerPanel.getChildren().add(this.appMenuView);
-		AnchorPane.setTopAnchor(this.appMenuView,42.0);
+		AnchorPane.setTopAnchor(this.appMenuView,getNavBarHeight());
 		AnchorPane.setLeftAnchor(this.appMenuView,0.0);
 		AnchorPane.setBottomAnchor(this.appMenuView,0.0);
 		appMenuController.setCurrentState(appMenuState.getValue());
 		appMenuController.onToggleMenuMode().subscribe(this::onToggleMenuMode);
-		DropShadow shadow1 = new DropShadow();
-		shadow1.setOffsetX(5);
-		shadow1.setOffsetY(0);
+		DropShadow shadow1 = new DropShadow(10,Color.BLACK);
+//		shadow1.setOffsetX(5);
+//		shadow1.setOffsetY(0);
 		this.appMenuView.setEffect(shadow1);
+	}
+	
+	private double getNavBarHeight() {
+		return this.appNavBarController.getNavBarHeight().getValue().doubleValue();
 	}
 	
 	protected void configureForActivity(Activity currentActivity) {
@@ -194,22 +209,52 @@ public class ApplicationController
 	protected void updateAppMenuState() {
 		AppMenuState menuState = this.appMenuState.getValue();
 		if (menuState.isHidden() || menuState.isClosed()) {
-			this.appMenuView.setVisible(false);
-			AnchorPane.setLeftAnchor(bodyPanel,0D);			
+			animateAppMenuToWidth(0D);			
 		}
 		else {
 			this.appMenuView.setVisible(true);
 			double width = this.appMenuController.getWidth();
-			this.appMenuView.setMinWidth(width);
-			this.appMenuView.setMaxWidth(width);
 			if (menuState.isOverlay()) {
-				AnchorPane.setLeftAnchor(bodyPanel,0D);
-			} else if (menuState.isMounted()) {
-				AnchorPane.setLeftAnchor(bodyPanel,width);
-			} else if (menuState.isBars()) {
-				AnchorPane.setLeftAnchor(bodyPanel,width);
+				animateAppMenuToWidth(width,0D);
+			} else {				
+				animateAppMenuToWidth(width);
 			}
 		}
+	}
+
+	private void animateAppMenuToWidth(double appMenuToWidth) {
+		animateAppMenuToWidth(appMenuToWidth, appMenuToWidth);
+	}
+	
+	private void animateAppMenuToWidth(double appMenuToWidth,double bodyPanelToLeft) {
+		double initialValue = appMenuView.getWidth();
+		double delta = appMenuToWidth - initialValue;
+		
+		double initialValueLeft = AnchorPane.getLeftAnchor(bodyPanel);
+		double deltaLeft = bodyPanelToLeft - initialValueLeft;
+		
+		final Animation animation = new Transition() {
+			
+		     {
+		         setCycleDuration(Duration.millis(200));
+		     }
+
+		     protected void interpolate(double frac) {
+		    	 
+		         final double width = initialValue + ( delta * frac);
+		         final double left = initialValueLeft + ( deltaLeft * frac);
+		         
+		         appMenuView.setMinWidth(width);
+		         appMenuView.setPrefWidth(width);
+		         appMenuView.setMaxWidth(width);
+		         AnchorPane.setLeftAnchor(bodyPanel,left);
+		     }
+		     
+		     
+
+		 };
+		 
+		 animation.play();
 	}
 
 	public Single<Boolean> pauseControllerView(AbstractController ac) {

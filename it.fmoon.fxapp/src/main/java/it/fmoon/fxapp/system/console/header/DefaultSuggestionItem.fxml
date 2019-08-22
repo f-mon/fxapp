@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox alignment="CENTER_LEFT" minHeight="40" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: yellow; -fx-border-width: 0 0 1 0; -fx-border-color: gray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="label" prefHeight="17.0" text="Label" />
+   </children>
+   <padding>
+      <Insets left="10.0" />
+   </padding>
+</HBox>

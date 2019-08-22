@@ -19,14 +19,16 @@ import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.mvc.Activity;
 import it.fmoon.fxapp.mvc.Page;
 import javafx.application.Platform;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 @Component
@@ -45,21 +47,25 @@ public class AppNavBarController
 		ActivityManager activityManager;
 
 		private ObservableValue<AppMenuState> appMenuState;
+		private Property<Number> navBarHeight = new SimpleObjectProperty<Number>(42D);
+
+
 
 		@FXML Button menuButton;
 
 		@FXML HBox navBar;
+
+		@FXML VBox navBarContainer;
+
+		private AbstractController currentPageHeader;
 	
 		@FXML
 		public void initialize() {
 			activityManager.onNavigationStack()
 				.debounce(200,TimeUnit.MILLISECONDS)
 				.subscribe(this::updateBreadcrumb);
-			
-			DropShadow shadow1 = new DropShadow();
-			shadow1.setOffsetX(0);
-			shadow1.setOffsetY(5);
-			navBar.setEffect(shadow1);
+			activityManager.onCurrentPage()
+				.subscribe(this::checkShowPageHeader);
 		}
 
 		@FXML 
@@ -86,6 +92,24 @@ public class AppNavBarController
 			return onLogin;
 		}
 	
+		public void checkShowPageHeader(Page currentPage) {
+			System.out.println("---> checkShowPageHeader");
+			AbstractController headerController = currentPage.getHeaderController();
+			if (this.currentPageHeader!=null && this.currentPageHeader!=headerController) {
+				this.navBarContainer.getChildren().remove(1);
+				this.currentPageHeader = null;
+			}
+			if (headerController!=null) {
+				this.currentPageHeader = headerController;
+				this.navBarContainer.getChildren().add(1,this.currentPageHeader.getView());	
+			}
+			if (this.currentPageHeader!=null) {				
+				this.navBarHeight.setValue(84D);
+			} else {
+				this.navBarHeight.setValue(42D);
+			}
+		}
+		
 		public void updateBreadcrumb(List<Page> navStack) {
 			System.out.println("---> updateBreadcrumb");
 			
@@ -170,6 +194,10 @@ public class AppNavBarController
 //				return FontAwesome.CHEVRON_LEFT;
 //			}
 //			return null;
+		}
+		
+		public ObservableValue<Number> getNavBarHeight() {
+			return navBarHeight;
 		}
 		
 }

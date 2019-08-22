@@ -97,6 +97,7 @@ public class BasePageImpl
 	private BiFunction<BasePageImpl,StopOptions,Single<Optional<Activity>>> closedPageHandler;
 	private BasePageImpl parentPage;
 	private String title;
+	private AbstractController headerController;
 	
 	
 	public BasePageImpl(PageDef pageDef) {
@@ -109,6 +110,15 @@ public class BasePageImpl
 		this.initialActivity = this.pageDef.getInitialActivity();
 		initTitle();
 		initPageMenu();
+		initHeaderController();
+	}
+
+	protected void initHeaderController() {
+		Class<? extends AbstractController> pageHeaderControllerClass = this.pageDef.getPageHeaderController();
+		if (pageHeaderControllerClass!=null) {
+			AbstractController pageHeaderController = this.applicationContext.getBean(pageHeaderControllerClass);
+			this.headerController = pageHeaderController;
+		}
 	}
 
 	protected void initPageMenu() {
@@ -285,6 +295,11 @@ public class BasePageImpl
 	@Override
 	public Observable<List<AppMenuItem>> getPageMenuObs() {
 		return this.pageMenuSubject;
+	}
+
+	@Override
+	public AbstractController getHeaderController() {
+		return this.headerController;
 	}
 
 }

@@ -18,6 +18,8 @@ public abstract class PageDef {
 	protected final Class<? extends Page> pageType;
 	protected final List<AppMenuItem> pageMenuDefinition;
 	
+	protected Class<? extends AbstractController> pageHeaderController;
+	
 	public PageDef() {
 		this(BasePageImpl.class);
 	}
@@ -57,6 +59,13 @@ public abstract class PageDef {
 		return "fa-file-o";
 	}
 	
+	
+	public Class<? extends AbstractController> getPageHeaderController() {
+		return pageHeaderController;
+	}
+	protected void setPageHeaderController(Class<? extends AbstractController> pageHeaderController) {
+		this.pageHeaderController = pageHeaderController;
+	}
 	
 	
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+
+<FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="50.0" vgap="50.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+	fx:controller="it.fmoon.fxapp.system.console.header.FxCommanderController">
+	<padding>
+		<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+	</padding>
+   <children>
+      <TextField fx:id="textField" />
+   </children>
+</FlowPane>

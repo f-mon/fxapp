@@ -26,6 +26,7 @@ public interface Page extends HasId {
 
 	Observable<List<AppMenuItem>> getPageMenuObs();
 
+	AbstractController getHeaderController();
 
 
 }
