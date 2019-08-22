@@ -3,6 +3,7 @@ package it.fmoon.fxapp.system.console.header;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets.SetView;
 
 import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.mvc.AbstractController;
@@ -32,8 +32,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -52,6 +54,8 @@ public class FxCommanderController extends AbstractController {
 	
 	@Autowired
 	private FxCommandService fxCommandService;
+
+	@FXML FlowPane pane;
 	
 	
 	@FXML
@@ -86,6 +90,45 @@ public class FxCommanderController extends AbstractController {
 		this.commandsQuery.addListener((observable,oldValue,newValue) -> {
 			checkRecalcSuggestions(newValue);
 		});
+		this.commandsQuery.addListener((observable,oldValue,newValue) -> {
+			checkShowQueryAspects(newValue);
+		});
+	}
+
+
+	private void checkShowQueryAspects(CommandsQuery applyedQuery) {
+		Set<Node> lookupAll = this.pane.lookupAll(".aspectView");
+		applyedQuery.getAspects().forEach((k,v)->{
+			Node aspectView = this.pane.lookup("#"+k);
+			if (aspectView==null) {
+				insertQueryAspectView(k,v);
+			} else {
+				lookupAll.remove(aspectView);
+				updateQueryAspectView(aspectView,k,v);
+			}
+		});
+		this.pane.getChildren().removeAll(lookupAll);
+	}
+
+
+	protected void updateQueryAspectView(Node aspectView, String aspectKey, Object value) {
+		// TODO Auto-generated method stub
+		((Label)aspectView).setText(aspectKey+": "+value);
+	}
+
+
+	protected void insertQueryAspectView(String aspectKey, Object value) {
+		Node aspectView = createQueryAspectView(aspectKey,value);
+		aspectView.setId("aspectKey");
+		aspectView.getStyleClass().add("aspectView");
+		this.pane.getChildren().add(aspectView);
+	}
+	
+	protected Node createQueryAspectView(String aspectKey, Object value) {
+		// TODO Auto-generated method stub
+		Label label = new Label(aspectKey+": "+value);
+		label.setTextFill(Color.WHITESMOKE);
+		return label;
 	}
 
 
@@ -117,7 +160,7 @@ public class FxCommanderController extends AbstractController {
 
 	private void activateCommand(CommandsQuery query, FxCommand activatedCommand) {
 		if (activatedCommand instanceof FxToggleCommand) {
-			this.commandsQuery.setValue(query.toggleFlagValue(activatedCommand.getName()));
+			this.commandsQuery.setValue(query.toggleFlagAspect(activatedCommand.getName()));
 		}
 	}
 
