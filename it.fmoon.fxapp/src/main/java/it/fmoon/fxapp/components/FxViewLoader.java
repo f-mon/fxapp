@@ -6,6 +6,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 import it.fmoon.fxapp.support.FxViewFactory;
 import javafx.scene.Node;
 
@@ -14,7 +16,7 @@ import javafx.scene.Node;
 public class FxViewLoader {
 
 	private FxLoader fxLoader;
-	private Node view;
+	private BehaviorSubject<Node> viewSubj = BehaviorSubject.create();
 
 	private AtomicBoolean building = new AtomicBoolean(false);
 
@@ -24,22 +26,24 @@ public class FxViewLoader {
 	}
 
 	public Node get(Object controller) {
-		if (this.view==null) {
+		if (!this.viewSubj.hasValue()) {
 			if (!building.getAndSet(true)) {
 				buildView(controller);
 			} else {
 				throw new IllegalStateException("FxViewLoader get method called while in building view");
 			}
 		}
-		return this.view;
+		return this.viewSubj.getValue();
 	}
 	
 	protected void buildView(Object controller) {
+		Node view;
 		if (controller instanceof FxViewFactory) {
-			this.view = ((FxViewFactory) controller).createView();
+			view = ((FxViewFactory) controller).createView();
 		} else {				
-			this.view = this.fxLoader.loadView(controller);
+			view = this.fxLoader.loadView(controller);
 		}
+		this.viewSubj.onNext(view);
 		building.set(false);
 	}
 
@@ -47,5 +51,7 @@ public class FxViewLoader {
 		return this.fxLoader;
 	}
 	
-	
+	public Observable<Node> onView() {
+		return this.viewSubj;
+	} 
 }

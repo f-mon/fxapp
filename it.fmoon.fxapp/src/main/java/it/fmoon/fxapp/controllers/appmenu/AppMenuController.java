@@ -20,12 +20,15 @@ import it.fmoon.fxapp.mvc.AbstractController;
 import it.fmoon.fxapp.mvc.Activity;
 import it.fmoon.fxapp.mvc.ActivityDef;
 import it.fmoon.fxapp.mvc.PageDef;
+import it.fmoon.fxapp.support.ViewUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
 @Component
 public class AppMenuController extends AbstractController {
@@ -64,7 +67,9 @@ public class AppMenuController extends AbstractController {
 
 	@FXML
 	public void initialize() {
-
+		 
+		this.onView().subscribe(ViewUtils::clipContent);
+		
 		this.applicationMenuPanel = new VBox();
 		this.pageMenuPanel = new VBox();
 		
