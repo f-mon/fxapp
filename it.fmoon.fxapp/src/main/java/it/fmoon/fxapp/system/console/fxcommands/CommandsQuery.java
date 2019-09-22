@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 public class CommandsQuery {
 	
 	private final String text;
-	private final ImmutableMap<String,Object> properties;
+	private final ImmutableMap<String,Object> aspects;
 
 	public CommandsQuery() {
 		this("",null);
@@ -16,7 +16,7 @@ public class CommandsQuery {
 	public CommandsQuery(String text,Map<String,Object> properties) {
 		super();
 		this.text = text;
-		this.properties = properties!=null?ImmutableMap.copyOf(properties):ImmutableMap.of();
+		this.aspects = properties!=null?ImmutableMap.copyOf(properties):ImmutableMap.of();
 	}
 
 	public String getText() {
@@ -24,26 +24,30 @@ public class CommandsQuery {
 	}
 
 	public CommandsQuery setText(String text) {
-		return new CommandsQuery(text,this.properties);
+		return new CommandsQuery(text,this.aspects);
 	}
 	
-	public CommandsQuery toggleFlagValue(String name) {
-		Map<String,Object> mutableProperties = mutableProperties();
+	public CommandsQuery toggleFlagAspect(String name) {
+		Map<String,Object> mutableProperties = mutableAspects();
 		mutableProperties.compute(name, (k,v)->(v==null)?Boolean.TRUE:!((Boolean)v));
 		return new CommandsQuery(text,mutableProperties);
+	}
+	
+	public ImmutableMap<String,Object> getAspects() {
+		return this.aspects;
 	}
 
 	
 	
-	private Map<String, Object> mutableProperties() {
-		return new HashMap<String, Object>(this.properties);
+	private Map<String, Object> mutableAspects() {
+		return new HashMap<String, Object>(this.aspects);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + ((aspects == null) ? 0 : aspects.hashCode());
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
 		return result;
 	}
@@ -57,10 +61,10 @@ public class CommandsQuery {
 		if (getClass() != obj.getClass())
 			return false;
 		CommandsQuery other = (CommandsQuery) obj;
-		if (properties == null) {
-			if (other.properties != null)
+		if (aspects == null) {
+			if (other.aspects != null)
 				return false;
-		} else if (!properties.equals(other.properties))
+		} else if (!aspects.equals(other.aspects))
 			return false;
 		if (text == null) {
 			if (other.text != null)
